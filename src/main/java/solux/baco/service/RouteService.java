@@ -6,22 +6,58 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.service.RouteModel.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
+
 public class RouteService {
 
-    //1. 출발 도착 좌표 얻는 메서드
-    //public Coordinate getCoordinate(String startPlace, String endPlace) {
-    //로직 구현 예정 (프론트엔드에서 바로 좌표를 넘겨주는 경우에는 getRoute메서드에 받는 부분만 추가 구현하면 됨.)
-    //}
+    //여러 메서드에서 사용할 예정인 변수들이라 멤버변수로 선언
+    List<List<Double>> path=null;
+    double[] startCoordinateArray;
+    double[] endCoordinateArray;
+    List<Double> startCoordinateCopy= new ArrayList<>();; //startCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
+    List<Double> endCoordinateCopy= new ArrayList<>();;//endCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
 
+    //전체 메서드 실행 순서을 담고있는 메서드
+    public Map<String, Object> passRouteData(double[] startCoordinateArray,double[] endCoordinateArray) {
 
+        /**
+     //임시 데이터 (좌표데이터 받는 메서드 구현 예정)
+         getCoordinate
+*/
+        //출발좌표와 도착좌표 복사
+        for (double startCoordinate : startCoordinateArray) {
+            startCoordinateCopy.add(startCoordinate);
+        }
+        for (double endCoordinate : endCoordinateArray) {
+            endCoordinateCopy.add(endCoordinate);
+        }
+
+        //1.네이버 지도 api 호출 후 경로좌표데이터 받기
+        getRoute(startCoordinateArray, endCoordinateArray);
+
+        //2.데이터 가공
+        Map<String, Object> processRouteMap = processRoute();
+
+        return processRouteMap;
+    }
+
+    //1. 출발 도착 좌표 얻는 메서드 =>DTO 필요할 듯
+    public void getCoordinate(String startPlace, String endPlace) {
+        double[] startCoordinateArray;
+        double[] endCoordinateArray;
+
+    }
 
 
     //2. 네이버 지도 API(Direction 5 driving) 활용해서 길찾기 기능 수행 후 결과 얻는 메서드
     //좌표 형태의 출발지,도착지를 얻은 상태로 가정.
-    public String getRoute(double[] startCoordinate, double[] endCoordinate) {
+    public void getRoute(double[] startCoordinate, double[] endCoordinate) {
 
         //(1)네이버 지도 API 호출하는 과정
         //WebClient 인스턴스 생성
@@ -37,7 +73,7 @@ public class RouteService {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
                 .queryParam("start", startParameter[0] + "," + startParameter[1])
                 .queryParam("goal", endParameter[0] + "," + endParameter[1])
-                .queryParam("option","trafast");
+                .queryParam("option", "trafast");
 
         //api 호출 후 응답받은 내용을 string 형태로 response에 저장.
         String response = webClient.get()
@@ -53,6 +89,8 @@ public class RouteService {
         // Jackson ObjectMapper 인스턴스 생성
         ObjectMapper objectMapper = new ObjectMapper();
 
+
+
         try {
             // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(JsonClass 클래스)에 매핑 후 JsonClass변수 jsonClass에 저장.
             JsonClass jsonClass = objectMapper.readValue(response, JsonClass.class);
@@ -61,11 +99,6 @@ public class RouteService {
             int code = jsonClass.getCode(); //code
             String message = jsonClass.getMessage(); //message
             String currentDateTime = jsonClass.getCurrentDateTime(); //currentDateTime
-
-            //확인용 출력 코드=> 정상적으로 출력됨
-            System.out.println("code:" +code);
-            System.out.println("message: " +message);
-            System.out.println("currentDateTime: " +currentDateTime);
 
             //중첩구조로 표현된 응답내용을 얻기 위해 인스턴스 생성(응답바디 구조 참고)
             RouteUnitEnt routeUnitEnt = jsonClass.getRoute(); //route
@@ -77,36 +110,36 @@ public class RouteService {
             Trafast trafast = trafastList.get(0);//trafast(trafastList의 0번째 요소)
             Summary summary = trafast.getSummary(); //summary
 
+            startCoordinateArray = new double[2];
+            startCoordinateArray[0] = summary.getStart().getLng();
+            startCoordinateArray[1] = summary.getStart().getLat();
 
-            //출발,도착 좌표
-            double startLng = summary.getStart().getLng(); //start_location_lng
-            double startLat = summary.getStart().getLat(); //start_location_lat
-
-            double goalLng = summary.getGoal().getLng(); //goal_location_lng
-            double goalLat = summary.getGoal().getLat(); //goal_location_lat
-            System.out.println("start: [     "+ startLng +","+startLat+ "      ]");
-            System.out.println("goal : [     "+ goalLng+","+goalLat+ "      ]");
+            endCoordinateArray = new double[2];
+            endCoordinateArray[0] = summary.getGoal().getLng();
+            endCoordinateArray[1] = summary.getGoal().getLat();
 
             //경로 좌표 배열
-            List<List<Double>> path = trafast.getPath();
-            //확인용 출력 코드 => 정상적으로 출력됨
-            System.out.println("path : "+ path);
+            path = trafast.getPath();
 
             //거리 길이(추후에 필요할 수도 있어서 테스트해봄)
             int distance = summary.getDistance();
-            //확인용 출력 코드 => 정상적으로 출력됨
-            System.out.println("distance: " + distance);
-
-
 
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
 
         }
-    return response;
-    //3. 프론트엔드로 데이터를 넘겨주는 부분 수정 예정
+
+
     }
 
+    public Map<String, Object> processRoute() {
+        Map<String,Object> processRouteData = new HashMap<>();
+        processRouteData.put("startCoordinate",startCoordinateCopy);
+        processRouteData.put("path",path);
+        processRouteData.put("endCoordinate",endCoordinateCopy);
+
+        return processRouteData;
+    }
 
 }

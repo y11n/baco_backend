@@ -11,8 +11,9 @@ public class RouteServiceTest {
         double[] startCoordinate = {127.12345, 37.12345};
         double[] endCoordinate = {128.12345, 38.12345};
 
-        RouteService routeServce = new RouteService();
-        routeServce.getRoute(startCoordinate,endCoordinate);
+        RouteService routeService = new RouteService();
+        String test = routeService.passRouteData(startCoordinate,endCoordinate).toString();
+        System.out.println(test);
 
 
     }
