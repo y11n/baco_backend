@@ -2,17 +2,17 @@ package solux.baco.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.service.RouteModel.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class RouteService {
 
@@ -24,38 +24,46 @@ public class RouteService {
     List<Double> endCoordinateCopy= new ArrayList<>();;//endCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
 
     //전체 메서드 실행 순서을 담고있는 메서드
-
-
-    @GetMapping("/Route/passRoute")
     public Map<String, Object> passRouteData(double[] startCoordinateArray,double[] endCoordinateArray) {
+        log.info("checkLog:RouteService - passRouteData called with startCoordinate: {} and endCoordinate: {}", startCoordinateArray, endCoordinateArray);
 
         /**
-     //임시 데이터 (좌표데이터 받는 메서드 구현 예정)
-         getCoordinate
-*/
-        //출발좌표와 도착좌표 복사
+        1. 좌표데이터 받는 메서드 (구현 예정) getCoordinate
+        */
+
+        //메서드 호출 시마다 startCoordinateArray,endCoordinateArray를 startCoordinateCopy,endCoordinateCopy에 매번 복사하면서 매번 배열에 같은 값이 추가되는 문제 발생
+        //그래서 초기화해주는 코드 추가함.
+        startCoordinateCopy.clear();
+        endCoordinateCopy.clear();
+        log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy(after clear): {} and endCoordinateCopy(after clear): {}", startCoordinateCopy, endCoordinateCopy);
+
+        //출발좌표와 도착좌표 복사 (double[]형태에서 List<Double>형태로 만들기 위한 과정)
         for (double startCoordinate : startCoordinateArray) {
             startCoordinateCopy.add(startCoordinate);
         }
         for (double endCoordinate : endCoordinateArray) {
             endCoordinateCopy.add(endCoordinate);
         }
+        log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
 
-        //1.네이버 지도 api 호출 후 경로좌표데이터 받기
+        //2.네이버 지도 api 호출 후 응답받고 필요한 데이터만 변수에 담는 메서드 호출
         getRoute(startCoordinateArray, endCoordinateArray);
+        log.info("checkLog:RouteService - passRouteData called with path: {}", path);
 
-        //2.데이터 가공
+        //3.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
         Map<String, Object> processRouteMap = processRoute();
+        log.info("checkLog:RouteService - passRouteData called with processRouteMap: {}", processRouteMap);
 
+        //4.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
         return processRouteMap;
     }
 
-    //1. 출발 도착 좌표 얻는 메서드 =>DTO 필요할 듯
-    public void getCoordinate(String startPlace, String endPlace) {
-        double[] startCoordinateArray;
-        double[] endCoordinateArray;
+        //1. 출발 도착 좌표 얻는 메서드 =>DTO 필요할 듯
+        /**public void getCoordinate(String startPlace, String endPlace) {
+            double[] startCoordinateArray;
+            double[] endCoordinateArray;
 
-    }
+        }*/
 
 
     //2. 네이버 지도 API(Direction 5 driving) 활용해서 길찾기 기능 수행 후 결과 얻는 메서드
@@ -68,7 +76,7 @@ public class RouteService {
 
         String apiUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving"; //네이버 api url
         String clientId = "73qkoqmj6s"; //네이버 지도 api 키 발급 id
-        String clientSecret = "7YAAchEyPbzK3Aozcm5RNC5eFQGi42GjNC8arNEW"; //네이버 지도 api 키 발급 pw
+        String clientSecret = "******"; //네이버 지도 api 키 발급 pw
         double[] startParameter = startCoordinate; //"127.12345, 37.12345"
         double[] endParameter = endCoordinate; //"128.12345,38.12345"
 
@@ -86,13 +94,11 @@ public class RouteService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
+        log.info("checkLog:RouteService - getRoute called with response: {}", response);
 
         //(2)응답 내용 중 필요한 정보 저장
         // Jackson ObjectMapper 인스턴스 생성
         ObjectMapper objectMapper = new ObjectMapper();
-
-
 
         try {
             // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(JsonClass 클래스)에 매핑 후 JsonClass변수 jsonClass에 저장.
@@ -108,7 +114,6 @@ public class RouteService {
 
             //trafast속성은 배열형태이기 때문에 먼저 배열형태의 trafastList를 저장한 다음,
             //trafastList에서 0번째 요소(summary(start_location,goal_location,distance 등),path 등이 포함됨.)에 해당하는 내용을 trafast에 저장해야함.
-
             List<Trafast> trafastList = routeUnitEnt.getTrafast(); //trafastList
             Trafast trafast = trafastList.get(0);//trafast(trafastList의 0번째 요소)
             Summary summary = trafast.getSummary(); //summary
@@ -120,29 +125,30 @@ public class RouteService {
             endCoordinateArray = new double[2];
             endCoordinateArray[0] = summary.getGoal().getLng();
             endCoordinateArray[1] = summary.getGoal().getLat();
+            log.info("checkLog:RouteService - getRoute called with startCoordinateArray: {} and endCoordinateArray: {}", startCoordinateArray, endCoordinateArray);
 
             //경로 좌표 배열
             path = trafast.getPath();
 
             //거리 길이(추후에 필요할 수도 있어서 테스트해봄)
             int distance = summary.getDistance();
-
-
+          //예외처리 구현예정
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-
         }
-
-
     }
 
+    //3.필요한 데이터 추출한 멤버변수를 객체형태로 만드는 단계의 메서드
     public Map<String, Object> processRoute() {
         Map<String,Object> processRouteData = new HashMap<>();
-        processRouteData.put("startCoordinate",startCoordinateCopy);
-        processRouteData.put("path",path);
-        processRouteData.put("endCoordinate",endCoordinateCopy);
 
-        return processRouteData;
+        processRouteData.put("startCoordinate",startCoordinateCopy); //출발좌표
+        processRouteData.put("path",path); //도착좌표
+        processRouteData.put("endCoordinate",endCoordinateCopy); //도착좌표
+        log.info("checkLog:RouteService - processRoute called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
+        log.info("checkLog:RouteService - processRoute called with path: {}", path);
+
+        return processRouteData; //Map<String, Object>형태로 반환하면 json으로 받을 수 있음.
     }
 
 }
