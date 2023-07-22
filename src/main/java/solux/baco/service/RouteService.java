@@ -3,6 +3,7 @@ package solux.baco.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.service.RouteModel.*;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-
 public class RouteService {
 
     //여러 메서드에서 사용할 예정인 변수들이라 멤버변수로 선언
@@ -24,6 +24,9 @@ public class RouteService {
     List<Double> endCoordinateCopy= new ArrayList<>();;//endCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
 
     //전체 메서드 실행 순서을 담고있는 메서드
+
+
+    @GetMapping("/Route/passRoute")
     public Map<String, Object> passRouteData(double[] startCoordinateArray,double[] endCoordinateArray) {
 
         /**
@@ -65,7 +68,7 @@ public class RouteService {
 
         String apiUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving"; //네이버 api url
         String clientId = "73qkoqmj6s"; //네이버 지도 api 키 발급 id
-        String clientSecret = "******"; //네이버 지도 api 키 발급 pw
+        String clientSecret = "7YAAchEyPbzK3Aozcm5RNC5eFQGi42GjNC8arNEW"; //네이버 지도 api 키 발급 pw
         double[] startParameter = startCoordinate; //"127.12345, 37.12345"
         double[] endParameter = endCoordinate; //"128.12345,38.12345"
 
