@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.service.RouteModel.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,21 +17,19 @@ import java.util.Map;
 public class RouteService {
 
     //여러 메서드에서 사용할 예정인 변수들이라 멤버변수로 선언
-    List<List<Double>> path = null;
-    //List<List<Double>> swapPath = null;
+    List<List<Double>> path=null;
     double[] startCoordinateArray;
     double[] endCoordinateArray;
-    List<Double> startCoordinateCopy = new ArrayList<>();
-    ; //startCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
-    List<Double> endCoordinateCopy = new ArrayList<>();
-    ;//endCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
-    double[] startCoordinateReal= new double[2];
-    double[] endCoordinateReal= new double[2];
+    List<Double> startCoordinateCopy= new ArrayList<>();; //startCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
+    List<Double> endCoordinateCopy= new ArrayList<>();;//endCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
 
     //전체 메서드 실행 순서을 담고있는 메서드
-    public Map<String, Object> passRouteData(double[] startCoordinateArray, double[] endCoordinateArray) {
-        log.info("checkLog:RouteService - passRouteData called with startCoordinateArray: {} and endCoordinateArray: {}", startCoordinateArray, endCoordinateArray);
+    public Map<String, Object> passRouteData(double[] startCoordinateArray,double[] endCoordinateArray) {
+        log.info("checkLog:RouteService - passRouteData called with startCoordinate: {} and endCoordinate: {}", startCoordinateArray, endCoordinateArray);
 
+        /**
+        1. 좌표데이터 받는 메서드 (구현 예정) getCoordinate
+        */
 
         //메서드 호출 시마다 startCoordinateArray,endCoordinateArray를 startCoordinateCopy,endCoordinateCopy에 매번 복사하면서 매번 배열에 같은 값이 추가되는 문제 발생
         //그래서 초기화해주는 코드 추가함.
@@ -40,48 +37,33 @@ public class RouteService {
         endCoordinateCopy.clear();
         log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy(after clear): {} and endCoordinateCopy(after clear): {}", startCoordinateCopy, endCoordinateCopy);
 
+        //출발좌표와 도착좌표 복사 (double[]형태에서 List<Double>형태로 만들기 위한 과정)
         for (double startCoordinate : startCoordinateArray) {
             startCoordinateCopy.add(startCoordinate);
         }
         for (double endCoordinate : endCoordinateArray) {
             endCoordinateCopy.add(endCoordinate);
         }
-        log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy(after loop ): {} and endCoordinateCopy(after loop ): {}", startCoordinateCopy, endCoordinateCopy);
-
-
-        getLngLat(startCoordinateArray, endCoordinateArray);
-
+        log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
 
         //2.네이버 지도 api 호출 후 응답받고 필요한 데이터만 변수에 담는 메서드 호출
-        getRoute(startCoordinateReal, endCoordinateReal);
-        log.info("checkLog:RouteService - passRouteData called with path(before swap): {}", path);
+        getRoute(startCoordinateArray, endCoordinateArray);
+        log.info("checkLog:RouteService - passRouteData called with path: {}", path);
 
-        //3. 경로 좌표 [경,위]에서 [위,경] 으로 변환
-        swapPath();
-        log.info("checkLog:RouteService - passRouteData called with path(after  swap): {}", path);
-
-        //4.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
+        //3.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
         Map<String, Object> processRouteMap = processRoute();
         log.info("checkLog:RouteService - passRouteData called with processRouteMap: {}", processRouteMap);
 
-        //5.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
+        //4.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
         return processRouteMap;
     }
 
-    //1. 좌표데이터 순서 바꾸는 메서드
-    public void getLngLat(double[] startCoordinateArray, double[] endCoordinateArray) {
-        //출발좌표와 도착좌표 복사 (double[]형태에서 List<Double>형태로 만들기 위한 과정)
+        //1. 출발 도착 좌표 얻는 메서드 =>DTO 필요할 듯
+        /**public void getCoordinate(String startPlace, String endPlace) {
+            double[] startCoordinateArray;
+            double[] endCoordinateArray;
 
-
-        //startCoordinateArray의 순서를 거꾸로=startCoordinateReal에 저장해야함
-        startCoordinateReal[0]=startCoordinateArray[1];
-        startCoordinateReal[1]=startCoordinateArray[0];
-
-        endCoordinateReal[0]=endCoordinateArray[1];
-        endCoordinateReal[1]=endCoordinateArray[0];
-        log.info("checkLog:RouteService - getLngLat called with startCoordinateReal: {} and endCoordinateReal: {}",startCoordinateReal,endCoordinateReal);
-
-    }
+        }*/
 
 
     //2. 네이버 지도 API(Direction 5 driving) 활용해서 길찾기 기능 수행 후 결과 얻는 메서드
@@ -94,7 +76,7 @@ public class RouteService {
 
         String apiUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving"; //네이버 api url
         String clientId = "73qkoqmj6s"; //네이버 지도 api 키 발급 id
-        String clientSecret = "wnIdOVMPQXJNfppSfPkArJgshAfSvWtgXMh1fBRr"; //네이버 지도 api 키 발급 pw
+        String clientSecret = "******"; //네이버 지도 api 키 발급 pw
         double[] startParameter = startCoordinate; //"127.12345, 37.12345"
         double[] endParameter = endCoordinate; //"128.12345,38.12345"
 
@@ -136,38 +118,33 @@ public class RouteService {
             Trafast trafast = trafastList.get(0);//trafast(trafastList의 0번째 요소)
             Summary summary = trafast.getSummary(); //summary
 
+            startCoordinateArray = new double[2];
+            startCoordinateArray[0] = summary.getStart().getLng();
+            startCoordinateArray[1] = summary.getStart().getLat();
+
+            endCoordinateArray = new double[2];
+            endCoordinateArray[0] = summary.getGoal().getLng();
+            endCoordinateArray[1] = summary.getGoal().getLat();
+            log.info("checkLog:RouteService - getRoute called with startCoordinateArray: {} and endCoordinateArray: {}", startCoordinateArray, endCoordinateArray);
+
             //경로 좌표 배열
             path = trafast.getPath();
 
             //거리 길이(추후에 필요할 수도 있어서 테스트해봄)
             int distance = summary.getDistance();
-            //예외처리 구현예정
+          //예외처리 구현예정
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
-    public void swapPath(){
-        for (List<Double> coordinate : path) {
-            double lng = coordinate.get(0);
-            double lat = coordinate.get(1);
-
-            coordinate.set(0,lat);
-            coordinate.set(1,lng);
-        }
-
-    }
-
-
-
-
     //3.필요한 데이터 추출한 멤버변수를 객체형태로 만드는 단계의 메서드
     public Map<String, Object> processRoute() {
-        Map<String, Object> processRouteData = new HashMap<>();
+        Map<String,Object> processRouteData = new HashMap<>();
 
-        processRouteData.put("startCoordinate", startCoordinateCopy); //출발좌표
-        processRouteData.put("path", path); //도착좌표 //swapPath로 바꿔야 하는 부분
-        processRouteData.put("endCoordinate", endCoordinateCopy); //도착좌표
+        processRouteData.put("startCoordinate",startCoordinateCopy); //출발좌표
+        processRouteData.put("path",path); //도착좌표
+        processRouteData.put("endCoordinate",endCoordinateCopy); //도착좌표
         log.info("checkLog:RouteService - processRoute called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
         log.info("checkLog:RouteService - processRoute called with path: {}", path);
 
