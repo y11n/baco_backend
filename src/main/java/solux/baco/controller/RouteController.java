@@ -23,11 +23,11 @@ public class RouteController {
 
     // (서버 배포 전)http://localhost:8080/Route/passRoute에 요청파라미터는 startCoordinate와 endCoordinate
     @GetMapping("/Route")
-    public Map<String, Object> getRouteController(@RequestParam double[] firstStartCoordinate, @RequestParam double[] firstEndCoordinate) {
-        log.info("checkLog:RouteController - getRouteController called with firststartCoordinate: {} and firstendCoordinate: {}", firstStartCoordinate, firstEndCoordinate);
+    public Map<String, Object> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
+        log.info("checkLog:RouteController - getRouteController called with start: {} and end: {}", start, end);
 
         //RouteService 호출
-        return routeService.passRouteData(firstStartCoordinate,firstEndCoordinate);
+        return routeService.passRouteData(start, end);
 
     }
 

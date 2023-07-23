@@ -18,42 +18,42 @@ import java.util.Map;
 public class RouteService {
 
     //여러 메서드에서 사용할 예정인 변수들이라 멤버변수로 선언
-    List<List<Double>> path = null;
-    //List<List<Double>> swapPath = null;
-    double[] startCoordinateArray;
-    double[] endCoordinateArray;
-    List<Double> startCoordinateCopy = new ArrayList<>();
-    ; //startCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
-    List<Double> endCoordinateCopy = new ArrayList<>();
-    ;//endCoordinateArray 형식은 제대로 값이 나타나지 않아서 다른 형식으로 데이터 복사
-    double[] startCoordinateReal= new double[2];
-    double[] endCoordinateReal= new double[2];
+    List<List<Double>> path = null; //경로좌표 List의 List
+
+    List<Double> startList = new ArrayList<>(); //(요청파라미터)시작좌표 List
+    List<Double> endList = new ArrayList<>(); //(도착파라미터)도착좌표 List
+    List<Double> startResponseList = new ArrayList<>(); //(네이버api응답)시작좌표 List
+    List<Double> endResponseList = new ArrayList<>(); //(네이버api응답)도착좌표 List
+
+
+    double[] startNaver = new double[2]; //네이버 호출 시 사용할 시작좌표 double배열
+    double[] endNaver = new double[2]; //네이버 호출 시 사용할 도착좌표 double배열 
 
     //전체 메서드 실행 순서을 담고있는 메서드
-    public Map<String, Object> passRouteData(double[] startCoordinateArray, double[] endCoordinateArray) {
-        log.info("checkLog:RouteService - passRouteData called with startCoordinateArray: {} and endCoordinateArray: {}", startCoordinateArray, endCoordinateArray);
+    public Map<String, Object> passRouteData(double[] startKakao, double[] endKakao) {
+        log.info("checkLog:RouteService - passRouteData called with startKakao: {} and endKakao: {}", startKakao, endKakao);
 
 
-        //메서드 호출 시마다 startCoordinateArray,endCoordinateArray를 startCoordinateCopy,endCoordinateCopy에 매번 복사하면서 매번 배열에 같은 값이 추가되는 문제 발생
+        //메서드 호출 시마다 startKakao,endKakao를 startList,endList에 매번 복사하면서 매번 배열에 같은 값이 추가되는 문제 발생
         //그래서 초기화해주는 코드 추가함.
-        startCoordinateCopy.clear();
-        endCoordinateCopy.clear();
-        log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy(after clear): {} and endCoordinateCopy(after clear): {}", startCoordinateCopy, endCoordinateCopy);
+        startList.clear();
+        endList.clear();
+        log.info("checkLog:RouteService - passRouteData called with startList(after clear): {} and endList(after clear): {}", startList, endList);
 
-        for (double startCoordinate : startCoordinateArray) {
-            startCoordinateCopy.add(startCoordinate);
+        for (double startCoordinate : startKakao) {
+            startList.add(startCoordinate);
         }
-        for (double endCoordinate : endCoordinateArray) {
-            endCoordinateCopy.add(endCoordinate);
+        for (double endCoordinate : endKakao) {
+            endList.add(endCoordinate);
         }
-        log.info("checkLog:RouteService - passRouteData called with startCoordinateCopy(after loop ): {} and endCoordinateCopy(after loop ): {}", startCoordinateCopy, endCoordinateCopy);
+        log.info("checkLog:RouteService - passRouteData called with startList(after loop ): {} and endList(after loop ): {}", startList, endList);
 
 
-        getLngLat(startCoordinateArray, endCoordinateArray);
+        getLngLat(startKakao, endKakao);
 
 
         //2.네이버 지도 api 호출 후 응답받고 필요한 데이터만 변수에 담는 메서드 호출
-        getRoute(startCoordinateReal, endCoordinateReal);
+        getRoute(startNaver, endNaver);
         log.info("checkLog:RouteService - passRouteData called with path(before swap): {}", path);
 
         //3. 경로 좌표 [경,위]에서 [위,경] 으로 변환
@@ -69,17 +69,17 @@ public class RouteService {
     }
 
     //1. 좌표데이터 순서 바꾸는 메서드
-    public void getLngLat(double[] startCoordinateArray, double[] endCoordinateArray) {
+    public void getLngLat(double[] startKakao, double[] endKakao) {
         //출발좌표와 도착좌표 복사 (double[]형태에서 List<Double>형태로 만들기 위한 과정)
 
 
-        //startCoordinateArray의 순서를 거꾸로=startCoordinateReal에 저장해야함
-        startCoordinateReal[0]=startCoordinateArray[1];
-        startCoordinateReal[1]=startCoordinateArray[0];
+        //startKakao의 순서를 거꾸로=startNaver에 저장해야함
+        startNaver[0]=startKakao[1];
+        startNaver[1]=startKakao[0];
 
-        endCoordinateReal[0]=endCoordinateArray[1];
-        endCoordinateReal[1]=endCoordinateArray[0];
-        log.info("checkLog:RouteService - getLngLat called with startCoordinateReal: {} and endCoordinateReal: {}",startCoordinateReal,endCoordinateReal);
+        endNaver[0]=endKakao[1];
+        endNaver[1]=endKakao[0];
+        log.info("checkLog:RouteService - getLngLat called with startNaver: {} and endNaver: {}", startNaver, endNaver);
 
     }
 
@@ -94,9 +94,9 @@ public class RouteService {
 
         String apiUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving"; //네이버 api url
         String clientId = "73qkoqmj6s"; //네이버 지도 api 키 발급 id
-        String clientSecret = "wnIdOVMPQXJNfppSfPkArJgshAfSvWtgXMh1fBRr"; //네이버 지도 api 키 발급 pw
-        double[] startParameter = startCoordinate; //"127.12345, 37.12345"
-        double[] endParameter = endCoordinate; //"128.12345,38.12345"
+        String clientSecret = "tKmrQEmfQ0rV0z7aTIO86uHnGL3bgfdw7hjy2YRt"; //네이버 지도 api 키 발급 pw
+        double[] startParameter = startCoordinate; //ex-"127.12345, 37.12345"
+        double[] endParameter = endCoordinate; //ex-"128.12345,38.12345"
 
         //요청 파라미터 설정 => url 쿼리 스트링 파라미터
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
@@ -136,6 +136,13 @@ public class RouteService {
             Trafast trafast = trafastList.get(0);//trafast(trafastList의 0번째 요소)
             Summary summary = trafast.getSummary(); //summary
 
+       startResponseList.add(0,summary.getStart().getLat());
+            startResponseList.add(1,summary.getStart().getLng());
+
+            endResponseList.add(0,summary.getGoal().getLat());
+            endResponseList.add(1,summary.getGoal().getLng());
+
+            log.info("checkLog:RouteService - getRoute called with startResponseList: {} and endResponseList : {} ", startResponseList,endResponseList);
             //경로 좌표 배열
             path = trafast.getPath();
 
@@ -165,10 +172,10 @@ public class RouteService {
     public Map<String, Object> processRoute() {
         Map<String, Object> processRouteData = new HashMap<>();
 
-        processRouteData.put("startCoordinate", startCoordinateCopy); //출발좌표
+        processRouteData.put("start", startResponseList); //출발좌표
         processRouteData.put("path", path); //도착좌표 //swapPath로 바꿔야 하는 부분
-        processRouteData.put("endCoordinate", endCoordinateCopy); //도착좌표
-        log.info("checkLog:RouteService - processRoute called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
+        processRouteData.put("end", endResponseList); //도착좌표
+        log.info("checkLog:RouteService - processRoute called with startList: {} and endList: {}", startList, endList);
         log.info("checkLog:RouteService - processRoute called with path: {}", path);
 
         return processRouteData; //Map<String, Object>형태로 반환하면 json으로 받을 수 있음.
