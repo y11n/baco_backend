@@ -1,5 +1,9 @@
 package solux.baco.controller;
 
+import jakarta.servlet.http.HttpSession;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import solux.baco.domain.Member;
 import solux.baco.service.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
+@Getter @Setter
 public class LoginController {
 
     private final LoginService loginService;
+    private Member presentMember;
 
     @GetMapping("/login")
     public String login(Model model) {
@@ -26,14 +32,17 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String loginId(@Valid LoginForm form, BindingResult bindingResult, HttpServletRequest request){
+    public String loginId(@ModelAttribute("form") LoginForm form, BindingResult bindingResult
+                          , HttpSession session){
 
         if(bindingResult.hasErrors()){
             return "login";
         }
 
-        loginService.login(form);
-        //Member loginMember = loginService.login(form);
-        return "redirect:/";
+        presentMember = loginService.login(form);
+
+        //현재 로그인한 회원의 이메일 정보를 세션에 담아줌
+        session.setAttribute("loginEmail", presentMember.getEmail());
+        return "sessionValueCheck";
     }
 }

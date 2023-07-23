@@ -16,7 +16,6 @@ import java.util.Optional;
 public class LoginService {
 
     private final MemberRepository memberRepository;
-
     public Member login(LoginForm loginForm){
         Optional<Member> findMember = memberRepository.findByEmail(loginForm.getEmail());
         if(!findMember.orElseThrow(()->new NotCorresspondingEmailException("해당 이메일이 존재하지 않습니다."))
