@@ -1,16 +1,20 @@
 package solux.baco.controller;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import solux.baco.service.RouteService;
+
+import java.util.HashMap;
 import java.util.Map;
 
 
 @Slf4j
 @RestController
-
 public class RouteController {
 
     private final RouteService routeService;
@@ -21,13 +25,37 @@ public class RouteController {
         this.routeService = routeService;
     }
 
-    // (서버 배포 전)http://localhost:8080/Route/passRoute에 요청파라미터는 startCoordinate와 endCoordinate
-    @GetMapping("/Route")
-    public Map<String, Object> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
+    // (서버 배포 전)http://localhost:8080/route/passRoute에 요청파라미터는 start와 end
+    @GetMapping("/route")
+    public ResponseEntity<Map<String, Object>> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
         log.info("checkLog:RouteController - getRouteController called with start: {} and end: {}", start, end);
 
-        //RouteService 호출
-        return routeService.passRouteData(start, end);
+        try {
+            log.info("checkLog:RouteController in try");
+
+            //예외처리 => 이어서 진행 예정
+            if (start == null || start.length != 2 || end == null || end.length != 2) {
+                Map<String, Object> failResponse = new HashMap<>();
+                failResponse.put("error", "필수 파라미터가 누락되었거나 잘못되었습니다. (start, end)");
+                return ResponseEntity.badRequest().body(failResponse);
+
+            }
+
+            //double[2]가 아닌 경우
+            else if (start.length != 2 || end.length != 2) {
+                throw new IllegalArgumentException("출발지와 도착지 좌표값이 잘못되었습니다.( 배열의 크기가 2가 아님)");
+            }
+
+            //정상적인 로직 가능한 경우에 실행되는 부분
+            //RouteService 호출
+            return ResponseEntity.ok(routeService.passRouteData(start, end));
+
+        }catch (IllegalArgumentException e) {
+            Map<String, Object> failResponse = new HashMap<>();
+            failResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(failResponse);
+        }
+
 
     }
 
