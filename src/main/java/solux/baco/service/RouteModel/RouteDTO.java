@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JsonClass {
+public class RouteDTO {
     //응답받은 정보에서 필요한 정보만 정의.
 
     private int code;

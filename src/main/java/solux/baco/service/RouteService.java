@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.service.RouteModel.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +24,7 @@ public class RouteService {
     List<Double> startResponseList = new ArrayList<>(); //(네이버api응답)시작좌표 List
     List<Double> endResponseList = new ArrayList<>(); //(네이버api응답)도착좌표 List
     double[] startNaver = new double[2]; //네이버 호출 시 사용할 시작좌표 double배열
-    double[] endNaver = new double[2]; //네이버 호출 시 사용할 도착좌표 double배열 
+    double[] endNaver = new double[2]; //네이버 호출 시 사용할 도착좌표 double배열
 
 
 
@@ -64,11 +65,15 @@ public class RouteService {
         }
         log.info("checkLog:RouteService - passRouteData called with path(before swap): {}", path);
 
-        //3.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
+        //3. 경로 좌표 [경,위]에서 [위,경] 으로 변환
+        swapPath();
+        log.info("checkLog:RouteService - passRouteData called with path(after  swap): {}", path);
+
+        //4.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
         Map<String, Object> processRouteMap = processRoute();
         log.info("checkLog:RouteService - passRouteData called with processRouteMap: {}", processRouteMap);
 
-        //4.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
+        //5.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
         return processRouteMap;
     }
 
@@ -132,19 +137,19 @@ public class RouteService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(JsonClass 클래스)에 매핑 후 JsonClass변수 jsonClass에 저장.
-            JsonClass jsonClass = objectMapper.readValue(response, JsonClass.class);
+            // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(RouteDTO 클래스)에 매핑 후 RouteDTO변수 RouteDTO에 저장.
+            RouteDTO RouteDTO = objectMapper.readValue(response, RouteDTO.class);
 
-            //jsonClass에 담긴 내용에서 getter를 통해 저장.
-            int code = jsonClass.getCode(); //code
+            //RouteDTO에 담긴 내용에서 getter를 통해 저장.
+            int code = RouteDTO.getCode(); //code
 
             //code가 0이면 길찾기 성공, code가 1~6 사이의 값이면 실패
             if (code == 0) {
-                String message = jsonClass.getMessage(); //message
-                String currentDateTime = jsonClass.getCurrentDateTime(); //currentDateTime
+                String message = RouteDTO.getMessage(); //message
+                String currentDateTime = RouteDTO.getCurrentDateTime(); //currentDateTime
 
                 //중첩구조로 표현된 응답내용을 얻기 위해 인스턴스 생성(응답바디 구조 참고)
-                RouteUnitEnt routeUnitEnt = jsonClass.getRoute(); //route
+                RouteUnitEnt routeUnitEnt = RouteDTO.getRoute(); //route
 
                 //trafast속성은 배열형태이기 때문에 먼저 배열형태의 trafastList를 저장한 다음,
                 //trafastList에서 0번째 요소(summary(start_location,goal_location,distance 등),path 등이 포함됨.)에 해당하는 내용을 trafast에 저장해야함.
@@ -168,9 +173,6 @@ public class RouteService {
                 return result;
             }
 
-            //거리 길이(추후에 필요할 수도 있어서 테스트해봄)
-            int distance = summary.getDistance();
-            //예외처리 구현예정
         } catch (JsonProcessingException e) {
             // 에러가 날 경우 로그 기록
             log.error("response_parsing error", e);
@@ -178,15 +180,21 @@ public class RouteService {
         return result;
     }
 
-    public void swapPath(){
+
+
+
+
+
+
+    //3. 응답으로 받은 경로좌표List를 [경도,위도] -> [위도,경도] 순으로 변경
+    public void swapPath() {
         for (List<Double> coordinate : path) {
             double lng = coordinate.get(0);
             double lat = coordinate.get(1);
 
-            coordinate.set(0,lat);
-            coordinate.set(1,lng);
+            coordinate.set(0, lat);
+            coordinate.set(1, lng);
         }
-
     }
 
 
@@ -197,12 +205,12 @@ public class RouteService {
 
     //4.필요한 데이터 추출한 멤버변수를 객체형태로 만드는 단계의 메서드
     public Map<String, Object> processRoute() {
-        Map<String,Object> processRouteData = new HashMap<>();
+        Map<String, Object> processRouteData = new HashMap<>();
 
-        processRouteData.put("startCoordinate", startCoordinateCopy); //출발좌표
-        processRouteData.put("path", path); //도착좌표 //swapPath로 바꿔야 하는 부분
-        processRouteData.put("endCoordinate", endCoordinateCopy); //도착좌표
-        log.info("checkLog:RouteService - processRoute called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
+        processRouteData.put("start", startResponseList); //출발좌표
+        processRouteData.put("path", path); //도착좌표
+        processRouteData.put("end", endResponseList); //도착좌표
+        log.info("checkLog:RouteService - processRoute called with startList: {} and endList: {}", startList, endList);
         log.info("checkLog:RouteService - processRoute called with path: {}", path);
 
         return processRouteData; //Map<String, Object>형태로 반환하면 json으로 받을 수 있음.

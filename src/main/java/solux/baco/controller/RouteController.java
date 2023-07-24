@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/Route")
+//@RequestMapping("/Route")
 public class RouteController {
 
     private final RouteService routeService;
