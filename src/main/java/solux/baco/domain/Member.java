@@ -22,7 +22,7 @@ public class Member {
 /*
     @ManyToOne
     @JoinColumn(name = "review_id", referencedColumnName = "id")
-    private Review review; //FK
+    private Review review; //FK (외래키)
 */
     //비밀번호 검증
     public boolean checkPassword(String password){

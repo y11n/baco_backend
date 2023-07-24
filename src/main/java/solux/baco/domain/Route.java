@@ -1,4 +1,5 @@
-/*package solux.baco.domain;
+/*
+package solux.baco.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

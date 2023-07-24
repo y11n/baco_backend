@@ -29,11 +29,11 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "member_id", referencedColumnName = "id")
-    private Member member; //FK
+    private Member member; //FK (외래키)
 
     @ManyToOne
     @JoinColumn(name = "route_id", referencedColumnName = "id")
-    private Route route; //FK
+    private Route route; //FK (외래키)
 
 
 }
