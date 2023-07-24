@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.service.RouteModel.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,15 +64,11 @@ public class RouteService {
         }
         log.info("checkLog:RouteService - passRouteData called with path(before swap): {}", path);
 
-        //3. 경로 좌표 [경,위]에서 [위,경] 으로 변환
-        swapPath();
-        log.info("checkLog:RouteService - passRouteData called with path(after  swap): {}", path);
-
-        //4.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
+        //3.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
         Map<String, Object> processRouteMap = processRoute();
         log.info("checkLog:RouteService - passRouteData called with processRouteMap: {}", processRouteMap);
 
-        //5.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
+        //4.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
         return processRouteMap;
     }
 
@@ -173,6 +168,9 @@ public class RouteService {
                 return result;
             }
 
+            //거리 길이(추후에 필요할 수도 있어서 테스트해봄)
+            int distance = summary.getDistance();
+            //예외처리 구현예정
         } catch (JsonProcessingException e) {
             // 에러가 날 경우 로그 기록
             log.error("response_parsing error", e);
@@ -180,21 +178,15 @@ public class RouteService {
         return result;
     }
 
-
-
-
-
-
-
-    //3. 응답으로 받은 경로좌표List를 [경도,위도] -> [위도,경도] 순으로 변경
-    public void swapPath() {
+    public void swapPath(){
         for (List<Double> coordinate : path) {
             double lng = coordinate.get(0);
             double lat = coordinate.get(1);
 
-            coordinate.set(0, lat);
-            coordinate.set(1, lng);
+            coordinate.set(0,lat);
+            coordinate.set(1,lng);
         }
+
     }
 
 
@@ -205,12 +197,12 @@ public class RouteService {
 
     //4.필요한 데이터 추출한 멤버변수를 객체형태로 만드는 단계의 메서드
     public Map<String, Object> processRoute() {
-        Map<String, Object> processRouteData = new HashMap<>();
+        Map<String,Object> processRouteData = new HashMap<>();
 
-        processRouteData.put("start", startResponseList); //출발좌표
-        processRouteData.put("path", path); //도착좌표
-        processRouteData.put("end", endResponseList); //도착좌표
-        log.info("checkLog:RouteService - processRoute called with startList: {} and endList: {}", startList, endList);
+        processRouteData.put("startCoordinate", startCoordinateCopy); //출발좌표
+        processRouteData.put("path", path); //도착좌표 //swapPath로 바꿔야 하는 부분
+        processRouteData.put("endCoordinate", endCoordinateCopy); //도착좌표
+        log.info("checkLog:RouteService - processRoute called with startCoordinateCopy: {} and endCoordinateCopy: {}", startCoordinateCopy, endCoordinateCopy);
         log.info("checkLog:RouteService - processRoute called with path: {}", path);
 
         return processRouteData; //Map<String, Object>형태로 반환하면 json으로 받을 수 있음.
