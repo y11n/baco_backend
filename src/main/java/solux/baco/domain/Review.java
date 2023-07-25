@@ -1,5 +1,3 @@
-/*
-
 package solux.baco.domain;
 
 
@@ -38,4 +36,3 @@ public class Review {
 
 }
 
- */
