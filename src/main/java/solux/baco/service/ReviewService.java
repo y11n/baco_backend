@@ -2,7 +2,6 @@ package solux.baco.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import solux.baco.service.ReviewModel.ReviewDTO;
 
 @Service
 @Slf4j
