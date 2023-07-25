@@ -4,13 +4,17 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 public class Member {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "member_id")
-    private Long id;
+    private Long member_id;
 
     private String email;
 
@@ -20,12 +24,11 @@ public class Member {
 
     private String nickname;
 
-    @ManyToOne
-    @JoinColumn(name = "review_id", referencedColumnName = "id")
-    private Review review; //FK (Review테이블과 매핑해서 회원정보(ex_닉네임) 알아내기 위해 외래키로 설정.)
+    @OneToMany(mappedBy = "member") //회원 고유 식별자로 후기를 찾아야해서 mappedBy ="member"
+    private List<Review> review; //FK
 
     //비밀번호 검증
-    public boolean checkPassword(String password){
+    public boolean checkPassword(String password) {
         return this.password.equals(password);
     }
 }

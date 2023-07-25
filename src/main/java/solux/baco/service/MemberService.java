@@ -16,7 +16,7 @@ public class MemberService {
     public Long join(Member member){
         password_check(member.getPassword(), member.getPassword2());
         memberRepository.save(member);
-        return member.getId();
+        return member.getMember_id();
     }
 
     private void password_check(String pwd, String pwd2) {

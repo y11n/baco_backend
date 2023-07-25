@@ -13,7 +13,7 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
-    private Long id;
+    private Long review_id;
 
     private String startPlace;
 
@@ -26,11 +26,10 @@ public class Review {
     private String hashtag;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    @JoinColumn(name = "member_id")
     private Member member; //FK
 
-    @ManyToOne
-    @JoinColumn(name = "route_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "review")
     private Route route; //FK
 
 

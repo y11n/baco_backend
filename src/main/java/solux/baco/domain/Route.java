@@ -12,16 +12,16 @@ public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_id")
-    private Long id;
+    private Long route_id;
 
-    private  String start;
+    private String start;
 
     private String end;
 
     private String path;
 
-    @ManyToOne
-    @JoinColumn(name = "review_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "review_id", unique = true)
     private Review review; //FK
 
 }
