@@ -14,9 +14,9 @@ public class Route {
     @Column(name = "route_id")
     private Long route_id;
 
-    private String start;
+    private String startPoint;
 
-    private String end;
+    private String endPont;
 
     private String path;
 
