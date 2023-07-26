@@ -25,7 +25,8 @@ public class MemberService {
         }
     }
 
-    public Member findOne(Long id){
-        return memberRepository.findOne(id);
+    //id => member_id로 변경(7/26)
+    public Member findOne(Long member_id){
+        return memberRepository.findOne(member_id);
     }
 }
