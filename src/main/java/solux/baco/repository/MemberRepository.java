@@ -15,15 +15,12 @@ public class MemberRepository {
     private EntityManager em;
 
     public void save(Member member){
-        if(member.getId() == null) {
-            em.persist(member);
-        } else {
-            em.merge(member);
-        }
+        em.persist(member);
     }
 
-    public Member findOne(Long id){
-        return em.find(Member.class, id);
+    //id => member_id로 변경(7/26)
+    public Member findOne(Long member_id){
+        return em.find(Member.class, member_id);
     }
 
     //이메일로 회원 조회

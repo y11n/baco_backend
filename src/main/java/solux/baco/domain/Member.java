@@ -13,7 +13,7 @@ public class Member {
 
     @Id @GeneratedValue
     @Column(name = "member_id")
-    private Long id;
+    private Long member_id;
 
     private String email;
 

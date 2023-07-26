@@ -1,6 +1,5 @@
 package solux.baco.service;
 
-import lombok.extern.slf4j.Slf4j;
 import solux.baco.controller.PasswordForm;
 import solux.baco.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,6 @@ import solux.baco.domain.Member;
 
 import java.util.Optional;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -21,7 +19,7 @@ public class MemberService {
     public Long join(Member member){
         password_check(member.getPassword(), member.getPassword2());
         memberRepository.save(member);
-        return member.getId();
+        return member.getMember_id();
     }
 
     private void password_check(String pwd, String pwd2) {
@@ -30,8 +28,9 @@ public class MemberService {
         }
     }
 
-    public Member findOne(Long id){
-        return memberRepository.findOne(id);
+    //id => member_id로 변경(7/26)
+    public Member findOne(Long member_id){
+        return memberRepository.findOne(member_id);
     }
 
     public Optional<Member> findByEmail(String email){
@@ -41,7 +40,7 @@ public class MemberService {
         //예외 처리 필요함...
         password_check(form.getNewPassword(), form.getNewPasswordConfirm());
         Member updateMember = new Member();
-        updateMember.setId(presentMember.get().getId());
+        updateMember.setMember_id(presentMember.get().getMember_id());
         updateMember.setEmail(presentMember.get().getEmail());
         updateMember.setNickname(presentMember.get().getNickname());
         updateMember.setPassword(form.getNewPassword());
