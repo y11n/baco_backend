@@ -26,11 +26,20 @@ public class Review {
     private String hashtag;
 
     @ManyToOne
+<<<<<<< HEAD
     @JoinColumn(name = "member_id")
     private Member member; //FK
 
     @OneToOne(mappedBy = "review")
     private Route route; //FK
+=======
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    private Member member; //FK (외래키)
+
+    @ManyToOne
+    @JoinColumn(name = "route_id", referencedColumnName = "id")
+    private Route route; //FK (외래키)
+>>>>>>> develop
 
 
 }

@@ -4,10 +4,20 @@ package solux.baco.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+<<<<<<< HEAD
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.ReviewService;
+=======
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import solux.baco.service.ReviewModel.ReviewDTO;
+import solux.baco.service.ReviewService;
+import solux.baco.service.RouteService;
+>>>>>>> develop
 
 @Slf4j
 @RestController
@@ -56,4 +66,8 @@ public class ReviewController {
     //작성글 조회
 
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> develop

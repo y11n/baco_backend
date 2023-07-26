@@ -1,10 +1,13 @@
 package solux.baco.service;
 
+import solux.baco.controller.PasswordForm;
 import solux.baco.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import solux.baco.domain.Member;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -28,5 +31,23 @@ public class MemberService {
     //id => member_id로 변경(7/26)
     public Member findOne(Long member_id){
         return memberRepository.findOne(member_id);
+<<<<<<< HEAD
+=======
+    }
+
+    public Optional<Member> findByEmail(String email){
+        return memberRepository.findByEmail(email);}
+
+    public void Password_update(PasswordForm form, Optional<Member> presentMember) {
+        //예외 처리 필요함...
+        password_check(form.getNewPassword(), form.getNewPasswordConfirm());
+        Member updateMember = new Member();
+        updateMember.setMember_id(presentMember.get().getMember_id());
+        updateMember.setEmail(presentMember.get().getEmail());
+        updateMember.setNickname(presentMember.get().getNickname());
+        updateMember.setPassword(form.getNewPassword());
+        updateMember.setPassword2(form.getNewPasswordConfirm());
+        memberRepository.save(updateMember);
+>>>>>>> develop
     }
 }

@@ -6,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RouteDTO {
+<<<<<<< HEAD
     //응답받은 정보에서 필요한 정보만 정의. DTO
+=======
+    //응답받은 정보에서 필요한 정보만 정의.
+>>>>>>> develop
 
     private int code;
 

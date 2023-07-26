@@ -24,7 +24,7 @@ public class RouteService {
     List<Double> startResponseList = new ArrayList<>(); //(네이버api응답)시작좌표 List
     List<Double> endResponseList = new ArrayList<>(); //(네이버api응답)도착좌표 List
     double[] startNaver = new double[2]; //네이버 호출 시 사용할 시작좌표 double배열
-    double[] endNaver = new double[2]; //네이버 호출 시 사용할 도착좌표 double배열 
+    double[] endNaver = new double[2]; //네이버 호출 시 사용할 도착좌표 double배열
 
 
 
@@ -137,19 +137,19 @@ public class RouteService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(JsonClass 클래스)에 매핑 후 JsonClass변수 jsonClass에 저장.
-            JsonClass jsonClass = objectMapper.readValue(response, JsonClass.class);
+            // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(RouteDTO 클래스)에 매핑 후 RouteDTO변수 RouteDTO에 저장.
+            RouteDTO RouteDTO = objectMapper.readValue(response, RouteDTO.class);
 
-            //jsonClass에 담긴 내용에서 getter를 통해 저장.
-            int code = jsonClass.getCode(); //code
+            //RouteDTO에 담긴 내용에서 getter를 통해 저장.
+            int code = RouteDTO.getCode(); //code
 
             //code가 0이면 길찾기 성공, code가 1~6 사이의 값이면 실패
             if (code == 0) {
-                String message = jsonClass.getMessage(); //message
-                String currentDateTime = jsonClass.getCurrentDateTime(); //currentDateTime
+                String message = RouteDTO.getMessage(); //message
+                String currentDateTime = RouteDTO.getCurrentDateTime(); //currentDateTime
 
                 //중첩구조로 표현된 응답내용을 얻기 위해 인스턴스 생성(응답바디 구조 참고)
-                RouteUnitEnt routeUnitEnt = jsonClass.getRoute(); //route
+                RouteUnitEnt routeUnitEnt = RouteDTO.getRoute(); //route
 
                 //trafast속성은 배열형태이기 때문에 먼저 배열형태의 trafastList를 저장한 다음,
                 //trafastList에서 0번째 요소(summary(start_location,goal_location,distance 등),path 등이 포함됨.)에 해당하는 내용을 trafast에 저장해야함.
