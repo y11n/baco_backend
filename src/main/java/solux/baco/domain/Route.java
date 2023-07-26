@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-/*
->>>>>>> develop
 package solux.baco.domain;
 
 import jakarta.persistence.*;

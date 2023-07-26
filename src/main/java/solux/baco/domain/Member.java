@@ -23,18 +23,10 @@ public class Member {
     private String password2;
 
     private String nickname;
-<<<<<<< HEAD
 
     @OneToMany(mappedBy = "member") //회원 고유 식별자로 후기를 찾아야해서 mappedBy ="member"
     private List<Review> review; //FK
 
-=======
-/*
-    @ManyToOne
-    @JoinColumn(name = "review_id", referencedColumnName = "id")
-    private Review review; //FK (외래키)
-*/
->>>>>>> develop
     //비밀번호 검증
     public boolean checkPassword(String password){
         return this.password.equals(password);

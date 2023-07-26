@@ -31,8 +31,6 @@ public class MemberService {
     //id => member_id로 변경(7/26)
     public Member findOne(Long member_id){
         return memberRepository.findOne(member_id);
-<<<<<<< HEAD
-=======
     }
 
     public Optional<Member> findByEmail(String email){
@@ -48,6 +46,5 @@ public class MemberService {
         updateMember.setPassword(form.getNewPassword());
         updateMember.setPassword2(form.getNewPasswordConfirm());
         memberRepository.save(updateMember);
->>>>>>> develop
     }
 }
