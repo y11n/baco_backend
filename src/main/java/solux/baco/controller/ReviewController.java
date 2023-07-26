@@ -27,14 +27,14 @@ public class ReviewController {
 
     //후기 저장(후기작성)
     @PostMapping("/create")
-    public ResponseEntity<String> saveReview(@RequestParam double[] start, @RequestParam double[] end, @RequestBody ReviewDTO reviewData) { //요청바디와 데이터 매핑.
+    public ResponseEntity<String> saveReview(@RequestParam double[] startPlace, @RequestParam double[] endPlace, @RequestBody ReviewDTO reviewData) { //요청바디와 데이터 매핑.
         try {
             //전달받은 데이터 예외처리
 
 
             //정상적인 로직 가능한 경우에 실행되는 부분
             //ReviewService 호출
-            reviewService.saveReview(start,end,reviewData);
+            reviewService.saveReview(startPlace,endPlace,reviewData);
 
             //db저장 성공 시
             return ResponseEntity.status(HttpStatus.CREATED).body("후기가 저장됐습니다.");
