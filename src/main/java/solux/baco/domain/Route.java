@@ -18,7 +18,7 @@ public class Route {
 
     private String endPont;
 
-    private String path;
+    private String pathPoint;
 
     @OneToOne
     @JoinColumn(name = "review_id", unique = true)

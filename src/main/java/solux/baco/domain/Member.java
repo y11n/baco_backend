@@ -28,7 +28,7 @@ public class Member {
     private List<Review> review; //FK
 
     //비밀번호 검증
-    public boolean checkPassword(String password) {
+    public boolean checkPassword(String password){
         return this.password.equals(password);
     }
 }
