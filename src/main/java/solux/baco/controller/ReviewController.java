@@ -39,22 +39,21 @@ public class ReviewController {
 
 
     @GetMapping("/test")
-    public void dateTest(){
+    public void dateTest() {
         /**
          //LocalDateTime 이용한 방법.
-        LocalDateTime date = LocalDateTime.now();
-        log.info("checklog: date = {}",date);
-        */
+         LocalDateTime date = LocalDateTime.now();
+         log.info("checklog: date = {}",date);
+         */
     }
-
 
 
     //후기 저장(후기작성)
     @PostMapping("/write")
     @ResponseBody
-    public ResponseEntity<String> writeReviewController(@RequestParam String email, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑. //HttpSession session
+    public ResponseEntity<String> writeReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
         try {
-            log.info("checklog: email:{}, reviewData:{}",email,reviewData);
+            //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
             /**정상적인 로직 가능한 경우에 실행되는 부분*/
 
@@ -62,9 +61,9 @@ public class ReviewController {
             String startPlace = reviewData.getStartPlace();
             String endPlace = reviewData.getEndPlace();
             String content = reviewData.getContent();
-            log.info("checklog: startPlace:{},endPlace:{},content:{}",startPlace,endPlace,content);
+            log.info("checklog: startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
             //ReviewService 호출
-            reviewService.saveReview(email,startPlace,endPlace,content); //email대신 session
+            reviewService.saveReview(session, startPlace, endPlace, content);
 
             //db저장 성공 시
             return ResponseEntity.status(HttpStatus.CREATED).body("후기가 저장됐습니다.");
