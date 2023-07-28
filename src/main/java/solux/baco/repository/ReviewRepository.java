@@ -33,8 +33,8 @@ public class ReviewRepository {
 
 
 
-    String sql = "INSERT INTO review (member_id,content,start_place,end_place) VALUES (?, ?, ?, ?)";
-    jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(),review.getEndPlace());
+    String sql = "INSERT INTO review (member_id,content,start_place,end_place, date) VALUES (?, ?, ?, ? , ?)";
+    jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(),review.getEndPlace(),review.getDate());
 
     }
 

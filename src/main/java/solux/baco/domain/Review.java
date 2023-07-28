@@ -103,11 +103,7 @@ public class Review {
     private Route route; //FK
 
 
-    @PrePersist
-    public void prePersist(){
-        date = LocalDate.now();
-        //time = LocalTime.now();
-    }
-
 }
+
+
 

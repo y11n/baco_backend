@@ -14,6 +14,7 @@ import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.RouteModel.RouteDTO;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -57,12 +58,16 @@ public class ReviewService {
             Member member = writerInfo.get();
             //Long member_id = member.getMember_id();
 
+            //LocalDate date = LocalDate.now();
+
             Review review = new Review();
             review.setMember(member); //작성자의 member테이블 레코드 저장
             review.setContent(content);
             review.setStartPlace(startPlace);
             review.setEndPlace(endPlace);
+            review.setDate(LocalDate.now());
             log.info("checklog: review: {}",review);
+
             reviewRepository.save(review);
 
             }
