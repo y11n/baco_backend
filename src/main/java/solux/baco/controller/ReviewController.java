@@ -45,16 +45,24 @@ public class ReviewController {
     public ResponseEntity<String> writeReviewController(@RequestHeader HttpSession session , @RequestBody ReviewDTO reviewData) { //요청바디와 데이터 매핑.
         try {
 
-            //세션 받아오면 테스트가능한 부분인지?
+            //1. 세션에서 이메일 추출하기
             String email = (String) session.getAttribute("loginEmail");
             log.info("checklog: loginEmail : {}",email);
             //전달받은 데이터 예외처리
 
+/**
+ //memberService의 findEmail메서드를 호출하고,
+ // memberService의 findEmail 메서드는 memberRepository의 findByEmail을 호출하고,
+ // memberRepository의 findByEmail메서드는 Member객체를 반환함. (Optional<Member>)
+ //Member객체에서 get으로 member_id를 찾으면 됨.
+ */
 
-            //세션에서 이메일 추출하기
+
+            //2. 이메일을 통해서 작성자의 Member객체 받아오기
             Optional<Member> writerInfo = memberService.findByEmail(email);
             //log.info("checkLog:ReviewController - writeReviewController called with wirter_id: {}",writerInfo);
 
+            //3. 받아온 Member객체를 통해서 member_id 추출하기
             if (writerInfo.isPresent()) {
                 //Optional 객체 속의 요소인 Member객체를 가져오기 위해 .get() //(null이 아닐 때만 get으로 가져올 수 있음.)
                 Member member = writerInfo.get();
@@ -64,29 +72,15 @@ public class ReviewController {
                 //예외처리
                 log.info("checkLog: ReviewController - Member not found with email: {}", email);
             }
-
-
-
+//ReviewDTO를 Service로 전달? 아니면 Controller에서 일단 요소를 추출?
 
             /**정상적인 로직 가능한 경우에 실행되는 부분*/
 
-            //ReviewService 호출 => 기능 변경
-            //reviewService에서 email=>member_id찾기,작성일은 어디서 추가?
-            //ReviewDTO를 Service로 전달? 아니면 Controller에서 일단 요소를 추출?
+
+
+            //ReviewService 호출
             reviewService.saveReview(email,reviewData);
 
-            //세션을 통해서 회원 정보 조회
-            //세션에서 loginEmail이라는 속성을 통해 얻은 정보를 string으로 변환해서 loginEmail이라는 string 변수에 담아줌.
-            String loginEmail = (String) session.getAttribute("loginEmail");
-            //얻은 loginEmail로 회원고유식별자를 알아냄. => MemberService의 기능을 사용하려면 생성자 만들어야할 것같음.
-
-            //memberService의 findEmail메서드를 호출하고,
-            // memberService의 findEmail 메서드는 memberRepository의 findByEmail을 호출하고,
-            // memberRepository의 findByEmail메서드는 Member객체를 반환함. (Optional<Member>)
-
-
-            Optional<Member> writerOfMember = memberService.findByEmail(loginEmail);
-            log.info("checkLog:ReviewController - writeReviewController called with wirter_id: {}",writerOfMember);
 
 
 
