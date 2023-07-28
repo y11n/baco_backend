@@ -36,26 +36,7 @@ public class ReviewController {
         this.memberService = memberService;
     }
 
-//이메일로 member_id을 얻기 위해 반환값 형태 보려고 한 테스트 메서드 => writeReviewController로 들어갈 예정..
-    @GetMapping("/findByEmail")
-    @ResponseBody
-    public void writer(@RequestParam String email){
-        log.info("checkLog:ReviewController - here");
 
-        //String email = "test@test.com";
-        Optional<Member> writerInfo = memberService.findByEmail(email);
-        //log.info("checkLog:ReviewController - writeReviewController called with wirter_id: {}",writerInfo);
-
-        if (writerInfo.isPresent()) {
-            //Optional 객체 속의 요소인 Member객체를 가져오기 위해 .get() //(null이 아닐 때만 get으로 가져올 수 있음.)
-            Member member = writerInfo.get();
-            Long member_id = member.getMember_id();
-            log.info("checkLog: ReviewController - writeReviewController called with member_id: {}", member_id);
-        } else {
-            //예외처리
-            log.info("checkLog: ReviewController - Member not found with email: {}", email);
-        }
-    }
 
 
     //후기 저장(후기작성)
@@ -63,15 +44,36 @@ public class ReviewController {
     @ResponseBody
     public ResponseEntity<String> writeReviewController(@RequestHeader HttpSession session , @RequestBody ReviewDTO reviewData) { //요청바디와 데이터 매핑.
         try {
-            log.info("checkLog:ReviewController -why why why");
 
+            //세션 받아오면 테스트가능한 부분인지?
+            String email = (String) session.getAttribute("loginEmail");
+            log.info("checklog: loginEmail : {}",email);
             //전달받은 데이터 예외처리
+
+
+            //세션에서 이메일 추출하기
+            Optional<Member> writerInfo = memberService.findByEmail(email);
+            //log.info("checkLog:ReviewController - writeReviewController called with wirter_id: {}",writerInfo);
+
+            if (writerInfo.isPresent()) {
+                //Optional 객체 속의 요소인 Member객체를 가져오기 위해 .get() //(null이 아닐 때만 get으로 가져올 수 있음.)
+                Member member = writerInfo.get();
+                Long member_id = member.getMember_id();
+                log.info("checkLog: ReviewController - writeReviewController called with member_id: {}", member_id);
+            } else {
+                //예외처리
+                log.info("checkLog: ReviewController - Member not found with email: {}", email);
+            }
+
+
 
 
             /**정상적인 로직 가능한 경우에 실행되는 부분*/
 
             //ReviewService 호출 => 기능 변경
-            //reviewService.saveReview(startPlace,endPlace,reviewData);
+            //reviewService에서 email=>member_id찾기,작성일은 어디서 추가?
+            //ReviewDTO를 Service로 전달? 아니면 Controller에서 일단 요소를 추출?
+            reviewService.saveReview(email,reviewData);
 
             //세션을 통해서 회원 정보 조회
             //세션에서 loginEmail이라는 속성을 통해 얻은 정보를 string으로 변환해서 loginEmail이라는 string 변수에 담아줌.
@@ -88,7 +90,7 @@ public class ReviewController {
 
 
 
-            //db저장 하는 service호출.
+            //db저장 하는 service호출(이후 repository 호출)
 
 
             //db저장 성공 시
