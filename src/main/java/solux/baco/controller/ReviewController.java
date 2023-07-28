@@ -19,6 +19,7 @@ import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.ReviewService;
 import solux.baco.service.RouteService;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -36,6 +37,15 @@ public class ReviewController {
         this.memberService = memberService;
     }
 
+
+    @GetMapping("/test")
+    public void dateTest(){
+        /**
+         //LocalDateTime 이용한 방법.
+        LocalDateTime date = LocalDateTime.now();
+        log.info("checklog: date = {}",date);
+        */
+    }
 
 
 
