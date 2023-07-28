@@ -12,6 +12,11 @@ import java.time.LocalDate;
 @Setter
 public class Review {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id")
+    private Long review_id;
+
     public Long getReview_id() {
         return review_id;
     }
@@ -19,6 +24,8 @@ public class Review {
     public void setReview_id(Long review_id) {
         this.review_id = review_id;
     }
+
+    private String startPlace;
 
     public String getStartPlace() {
         return startPlace;
@@ -28,6 +35,8 @@ public class Review {
         this.startPlace = startPlace;
     }
 
+    private String endPlace;
+
     public String getEndPlace() {
         return endPlace;
     }
@@ -35,6 +44,8 @@ public class Review {
     public void setEndPlace(String endPlace) {
         this.endPlace = endPlace;
     }
+
+    private String content;
 
     public String getContent() {
         return content;
@@ -44,6 +55,8 @@ public class Review {
         this.content = content;
     }
 
+    private java.time.LocalDate date;
+
     public LocalDate getDate() {
         return date;
     }
@@ -51,6 +64,11 @@ public class Review {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+
+    //보류 필드
+    //private java.time.LocalTime time;
+
+    private String hashtag;
 
     public String getHashtag() {
         return hashtag;
@@ -60,6 +78,10 @@ public class Review {
         this.hashtag = hashtag;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member; //FK
+
     public Member getMember() {
         return member;
     }
@@ -68,6 +90,10 @@ public class Review {
         this.member = member;
     }
 
+    @OneToOne
+    @JoinColumn(name = "route_id")
+    private Route route; //FK
+
     public Route getRoute() {
         return route;
     }
@@ -75,33 +101,6 @@ public class Review {
     public void setRoute(Route route) {
         this.route = route;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id")
-    private Long review_id;
-
-    private String startPlace;
-
-    private String endPlace;
-
-    private String content;
-
-    private java.time.LocalDate date;
-
-    //보류 필드
-    //private java.time.LocalTime time;
-
-    private String hashtag;
-
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member; //FK
-
-    @OneToOne
-    @JoinColumn(name = "route_id")
-    private Route route; //FK
-
 
 }
 

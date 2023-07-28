@@ -21,20 +21,19 @@ public class ReviewRepository {
 
 
     //void에서 http응답 반환할 수 있도록 변환 예정
-    public void save(Review review){
+    public void save(Review review) {
 
-        log.info("checklog: review.getEndPlace: {}",review.getEndPlace());
+        log.info("checklog: review.getEndPlace: {}", review.getEndPlace());
 
-        log.info("checklog: review.getStartPlace: {}",review.getStartPlace());
+        log.info("checklog: review.getStartPlace: {}", review.getStartPlace());
 
-        log.info("checklog: review.getContent: {}",review.getContent());
+        log.info("checklog: review.getContent: {}", review.getContent());
 
-        log.info("checklog: review.getMember: {}",review.getMember());
+        log.info("checklog: review.getMember: {}", review.getMember());
 
 
-
-    String sql = "INSERT INTO review (member_id,content,start_place,end_place, date) VALUES (?, ?, ?, ? , ?)";
-    jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(),review.getEndPlace(),review.getDate());
+        String sql = "INSERT INTO review (member_id,content,start_place,end_place, date) VALUES (?, ?, ?, ? , ?)";
+        jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate());
 
     }
 

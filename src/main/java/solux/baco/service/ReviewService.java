@@ -32,15 +32,15 @@ public class ReviewService {
         this.memberService = memberService;
     }
 
-    public void saveReview(String email, String startPlace,  String endPlace,  String content ) { //email대신 HttpSession session
+    public void saveReview(HttpSession session, String startPlace, String endPlace, String content) {
         //수정된 기능)경로 좌표 반환 api 호출해서 경로좌표,(경로기준)출발좌표,(경로기준)도착좌표 받아오기=>저장할 데이터 준비 완료 => 기능 변경
-/**세션부분은 테스트 생략
+
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
         log.info("checklog: loginEmail : {}", email);
         //전달받은 데이터 예외처리
 
-
+/**
  //memberService의 findEmail메서드를 호출하고,
  // memberService의 findEmail 메서드는 memberRepository의 findByEmail을 호출하고,
  // memberRepository의 findByEmail메서드는 Member객체를 반환함. (Optional<Member>)
@@ -50,7 +50,7 @@ public class ReviewService {
         log.info("checklog: ReviewService");
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
-        log.info("checklog: writerInfo: {}",writerInfo);
+        log.info("checklog: writerInfo: {}", writerInfo);
 
         //3. 받아온 Member객체를 통해서 member_id 추출하기
         if (writerInfo.isPresent()) {
@@ -66,21 +66,18 @@ public class ReviewService {
             review.setStartPlace(startPlace);
             review.setEndPlace(endPlace);
             review.setDate(LocalDate.now());
-            log.info("checklog: review: {}",review);
+            log.info("checklog: review: {}", review);
 
             reviewRepository.save(review);
 
-            }
-
-
-
-
-
         }
-
-        //응답 반환
 
 
     }
+
+    //응답 반환
+
+
+}
 
 
