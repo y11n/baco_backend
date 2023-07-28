@@ -2,11 +2,13 @@ package solux.baco.repository;
 
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 
+@Slf4j
 @Repository
 @Transactional
 public class ReviewRepository {
@@ -20,14 +22,19 @@ public class ReviewRepository {
 
     //void에서 http응답 반환할 수 있도록 변환 예정
     public void save(Review review){
-        /** review.setMember(writerInfo.get()); //작성자의 member테이블 레코드 저장
-         review.setContent(content);
-         review.setStartPlace(startPlace);
-         review.setEndPlace(endPlace);
-         */
 
-    String sql = "INSERT INTO review (member,content,startPlace,endPlace) VALUES (?, ?, ?)";
-    jdbcTemplate.update(sql, review.getMember(), review.getContent(), review.getStartPlace(),review.getEndPlace());
+        log.info("checklog: review.getEndPlace: {}",review.getEndPlace());
+
+        log.info("checklog: review.getStartPlace: {}",review.getStartPlace());
+
+        log.info("checklog: review.getContent: {}",review.getContent());
+
+        log.info("checklog: review.getMember: {}",review.getMember());
+
+
+
+    String sql = "INSERT INTO review (member_id,content,start_place,end_place) VALUES (?, ?, ?, ?)";
+    jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(),review.getEndPlace());
 
     }
 
