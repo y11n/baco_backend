@@ -5,6 +5,7 @@ package solux.baco.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -12,9 +13,11 @@ import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDTO;
+import solux.baco.service.ReviewModel.ReviewDetailDTO;
 import solux.baco.service.RouteModel.RouteDTO;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,6 +33,53 @@ public class ReviewService {
 
         this.reviewRepository = reviewRepository;
         this.memberService = memberService;
+    }
+
+
+    public ReviewDetailDTO reviewDetail(Long review_id) {
+        //review_id에 해당되는 저장값 가져오도록 repository 호출
+        ReviewDetailDTO reviewDetailDTO=new ReviewDetailDTO();
+        try {
+            Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
+            //startPlace,endPlace,content,date,member_id(nickname을 구하기 위해서 member_id도 포함)
+            //Optional이기 때문에 null일 수도 있음.
+            if (reviewEntity.isPresent()) {
+                Review review = reviewEntity.get();
+                String startPlace = review.getStartPlace();
+                String endPlace = review.getEndPlace();
+                String content = review.getContent();
+                LocalDate date = review.getDate();
+                Long member_id = review.getMember().getMember_id();
+
+                //Optional이기 때문에 null일 수도 있음.
+                Optional<Member> memberEntity = reviewRepository.detailMember(member_id);
+                if (memberEntity.isPresent()) {
+                    Member member = memberEntity.get();
+                    String nickname = member.getNickname();
+
+                    //dto로 변환
+
+                    reviewDetailDTO.setStartPlace(startPlace);
+                    reviewDetailDTO.setEndPlace(endPlace);
+                    reviewDetailDTO.setContent(content);
+                    reviewDetailDTO.setDate(date);
+                    reviewDetailDTO.setNickname(nickname);
+                }
+            }
+
+
+            /**  String startPlace = reviewData.getStartPlace();
+             String endPlace = reviewData.getEndPlace();
+             String content = reviewData.getContent();
+             */
+
+
+
+        } catch (Exception e) {
+            //예외처리 예정
+        }
+        return reviewDetailDTO;
+
     }
 
     public void saveReview(HttpSession session, String startPlace, String endPlace, String content) {

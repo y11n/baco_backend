@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import solux.baco.domain.Member;
+import solux.baco.domain.Review;
 import solux.baco.service.MemberService;
 import solux.baco.service.ReviewModel.ReviewDTO;
+import solux.baco.service.ReviewModel.ReviewDetailDTO;
 import solux.baco.service.ReviewService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import solux.baco.service.ReviewService;
 import solux.baco.service.RouteService;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -38,7 +41,7 @@ public class ReviewController {
     }
 
 
-    @GetMapping("/test")
+    //@GetMapping("/test")
     public void dateTest() {
         /**
          //LocalDateTime 이용한 방법.
@@ -49,9 +52,9 @@ public class ReviewController {
 
 
     //후기 저장(후기작성)
-    @PostMapping("/write")
+    @PostMapping("/save")
     @ResponseBody
-    public ResponseEntity<String> writeReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<String> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
         try {
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
@@ -75,17 +78,25 @@ public class ReviewController {
 
         }
 
-
     }
 
 
-    //후기 게시판 목록 조회
 
     //후기 게시글 상세 조회
+    @GetMapping("/detail/{review_id}")
+    public ReviewDetailDTO reviewDetailContriller (@PathVariable Long review_id){
+        try {
+            //예외처리 구현 예정
+            return reviewService.reviewDetail(review_id);
 
-    //작성글 목록 조회
 
-    //작성글 조회
+
+        }catch (Exception e) {
+            //예외처리 구현 예정
+            return null;
+        }
+
+    }
 
 
 }
