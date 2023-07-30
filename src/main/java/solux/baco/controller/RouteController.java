@@ -27,7 +27,7 @@ public class RouteController {
         this.routeService = routeService;
     }
 
-    // (서버 배포 전)http://localhost:8080/route/passRoute에 요청파라미터는 start와 end
+    // (서버 배포 전)http://localhost:8080/route에 요청파라미터는 start와 end
     @GetMapping("/route")
     public ResponseEntity<Map<String, Object>> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
         log.info("checkLog:RouteController - getRouteController called with start: {} and end: {}", start, end);

@@ -21,22 +21,22 @@ public class ReviewDetailDTO {
         this.content = content;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     private String startPlace;
 
     private String endPlace;
 
     private String content;
 
-    private LocalDate date ;
 
-    private String nickname;
+    public String getMapUrl() {
+        return mapUrl;
+    }
+
+    public void setMapUrl(String mapUrl) {
+        this.mapUrl = mapUrl;
+    }
+
+    //7/30 추가
+    private String mapUrl;
 
 }

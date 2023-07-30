@@ -9,6 +9,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
+import solux.baco.domain.Route;
+import solux.baco.service.RouteModel.JsonDataEntity;
 
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public class ReviewRepository {
 
 
     //void에서 http응답 반환할 수 있도록 변환 예정
-    public void save(Review review) {
+    public Optional<Review>  save(Review review) {
 
         log.info("checklog: review.getEndPlace: {}", review.getEndPlace());
 
@@ -39,22 +41,25 @@ public class ReviewRepository {
         log.info("checklog: review.getMember: {}", review.getMember());
 
 
-        String sql = "INSERT INTO review (member_id,content,start_place,end_place, date) VALUES (?, ?, ?, ? , ?)";
-        jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate());
+        String sql = "INSERT INTO review (member_id,content,start_place,end_place, date,routePoint) VALUES (?, ?, ?, ? , ?, ?)";
+        jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(),review.getRoutePoint());
 
+        return Optional.ofNullable(review);
     }
+
+
+
     //getReviewByReview_id (게시글 상세조회)_1.후기테이블정보
     public Optional<Review> detailReview(Long review_id) {
-        Review review = entityManager.find(Review.class,review_id);
+        Review review = entityManager.find(Review.class, review_id);
         return Optional.ofNullable(review);
 
     }
 
     //getReviewByReview_id (게시글 상세조회)_2.회원테이블정보
     public Optional<Member> detailMember(Long member_id) {
-        Member member =  entityManager.find(Member.class,member_id);
+        Member member = entityManager.find(Member.class, member_id);
         return Optional.ofNullable(member);
     }
 
-    //getReviewByHashtag (특정 해시태그로 게시글 목록(게시판) 조회)
 }

@@ -110,7 +110,7 @@ public class RouteService {
 
         String apiUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving"; //네이버 api url
         String clientId = "73qkoqmj6s"; //네이버 지도 api 키 발급 id
-        String clientSecret = "a5WOWVLA6Zv4qq5dTuygaWiBMkcmTt69YT6jWiYa"; //네이버 지도 api 키 발급 pw
+        String clientSecret = "*****"; //네이버 지도 api 키 발급 pw
         double[] startParameter = startCoordinate; //ex-"127.12345, 37.12345"
         double[] endParameter = endCoordinate; //ex-"128.12345,38.12345"
 
