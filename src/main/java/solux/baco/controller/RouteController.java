@@ -30,7 +30,7 @@ public class RouteController {
 
     // (서버 배포 전)http://localhost:8080/route에 요청파라미터는 start와 end
     @GetMapping("/route")
-    public List<List<Double>>  getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
+    public List<List<Double>> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
         log.info("checkLog:RouteController - getRouteController called with start: {} and end: {}", start, end);
 
         try {
@@ -53,7 +53,7 @@ public class RouteController {
             //RouteService 호출
             return (routeService.passRouteData(start, end));
 
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
             return null;
         }

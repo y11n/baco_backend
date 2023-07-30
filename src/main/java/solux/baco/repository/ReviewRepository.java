@@ -29,8 +29,8 @@ public class ReviewRepository {
     }
 
 
-    //void에서 http응답 반환할 수 있도록 변환 예정
-    public Optional<Review>  save(Review review) {
+    //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
+    public Optional<Review> save(Review review) {
 
         log.info("checklog: review.getEndPlace: {}", review.getEndPlace());
 
@@ -41,12 +41,13 @@ public class ReviewRepository {
         log.info("checklog: review.getMember: {}", review.getMember());
 
         log.info("checklog: review.getRoutePoint: {}", review.getRoute_point());
+
+
         String sql = "INSERT INTO review (member_id,content,start_place,end_place, date,route_point) VALUES (?, ?, ?, ? , ?, ?)";
-        jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(),review.getRoute_point());
+        jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(), review.getRoute_point());
 
         return Optional.ofNullable(review);
     }
-
 
 
     //getReviewByReview_id (게시글 상세조회)_1.후기테이블정보

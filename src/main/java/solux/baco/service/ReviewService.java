@@ -25,7 +25,6 @@ public class ReviewService {
 
     public ReviewService(ReviewRepository reviewRepository, MemberService memberService) {
 
-
         this.reviewRepository = reviewRepository;
         this.memberService = memberService;
     }
@@ -33,30 +32,21 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public ReviewDetailDTO saveReview(String startPlace, String endPlace, String content, String routePoint) {
+    public ReviewDetailDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
         log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", content);
         log.info("checklog: review.setRoutePoint(routePoint): {}", routePoint);
 
 
-        /**
-         //수정된 기능) 서울 내 특정 장소명을 string으로 전달받으면, 데이터가 있는 경우에 한해서 좌표값으로 경로api 호출 후, 경로 저장.
-         //이후, 게시글 상세보기 요청이 들어오면 경로데이터를 html에 렌더링해서 html에는 경로가 나타날 거고, 그 html의 url을 프론트엔드로 string형태로 넘긴 후
-         //프론트엔드에서는 iframe src를 해당 url로 연결하면 끝!!!
-         */
-
         Review review = new Review();
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
         String mapUrl;
-        String email ="test2@test.com";
 
-/**
- //memberService의 findEmail메서드를 호출하고,
- // memberService의 findEmail 메서드는 memberRepository의 findByEmail을 호출하고,
- // memberRepository의 findByEmail메서드는 Member객체를 반환함. (Optional<Member>)
- //Member객체에서 get으로 member_id를 찾으면 됨.
- */
+        //1. 세션에서 이메일 추출하기
+        String email = (String) session.getAttribute("loginEmail");
+        log.info("checklog: loginEmail : {}", email);
+        //전달받은 데이터 예외처리
 
         log.info("checklog: ReviewService");
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
@@ -90,88 +80,73 @@ public class ReviewService {
         } else {
             mapUrl = "실패";
         }
-        //반활할 값만 얻기 위해서 따로 객체 생성?
-
         return reviewDetailDTO;
     }
-
-
-    /**
-     * 경로 json 테스트
-     */
-    /**
-     //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
-     public JsonDataEntity getJsonData(Long review_id) {
-     //review_id로 review레코드를 찾아서 route_id를 빼와야하고,
-     // route_id로 다시 routePoint를 빼와야함.
-     // routePoint는 JsonDataEntity구조와 매핑돼서 객체형태로 저장한 후 controller->html로 전달됨.
-     try {
-     String routePoint = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
-
-     //routePoint를 jsonDataEntity형태로 파싱하기.
-     ObjectMapper objectMapper = new ObjectMapper();
-
-     JsonDataEntity jsonDataEntity = objectMapper.readValue(routePoint, JsonDataEntity.class);
-     return jsonDataEntity;
-
-
-     } catch (IOException e) {
-     e.printStackTrace();
-     return null;
-     }
-     }
-
-     /**
-     * 경로 json 테스트
-     */
-    /**
-     * //(데이터 빼올 때 )
-     * public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
-     * //review_id에 해당되는 저장값 가져오도록 repository 호출
-     * ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
-     * try {
-     * Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
-     * //startPlace,endPlace,content,date,member_id(nickname을 구하기 위해서 member_id도 포함)
-     * //Optional이기 때문에 null일 수도 있음.
-     * if (reviewEntity.isPresent()) {
-     * Review review = reviewEntity.get();
-     * String startPlace = review.getStartPlace();
-     * String endPlace = review.getEndPlace();
-     * String content = review.getContent();
-     * LocalDate date = review.getDate();
-     * Long member_id = review.getMember().getMember_id();
-     * <p>
-     * //Optional이기 때문에 null일 수도 있음.
-     * Optional<Member> memberEntity = reviewRepository.detailMember(member_id);
-     * if (memberEntity.isPresent()) {
-     * Member member = memberEntity.get();
-     * String nickname = member.getNickname();
-     * <p>
-     * <p>
-     * //return할 dto로 변환
-     * reviewDetailDTO.setStartPlace(startPlace);
-     * reviewDetailDTO.setEndPlace(endPlace);
-     * reviewDetailDTO.setContent(content);
-     * reviewDetailDTO.setDate(date);
-     * reviewDetailDTO.setNickname(nickname);
-     * reviewDetailDTO.setMapUrl(mapUrl);
-     * }
-     * <p>
-     * <p>
-     * }
-     * } catch (Exception e) {
-     * <p>
-     * return null; //예외처리 구현예정
-     * }
-     * return reviewDetailDTO;
-     * }
-     * <p>
-     * /**  String startPlace = reviewData.getStartPlace();
-     * String endPlace = reviewData.getEndPlace();
-     * String content = reviewData.getContent();
-     */
-
-
 }
 
 
+/**
+ * //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
+ * public JsonDataEntity getJsonData(Long review_id) {
+ * //review_id로 review레코드를 찾아서 route_id를 빼와야하고,
+ * // route_id로 다시 routePoint를 빼와야함.
+ * // routePoint는 JsonDataEntity구조와 매핑돼서 객체형태로 저장한 후 controller->html로 전달됨.
+ * try {
+ * String routePoint = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
+ * <p>
+ * //routePoint를 jsonDataEntity형태로 파싱하기.
+ * ObjectMapper objectMapper = new ObjectMapper();
+ * <p>
+ * JsonDataEntity jsonDataEntity = objectMapper.readValue(routePoint, JsonDataEntity.class);
+ * return jsonDataEntity;
+ * <p>
+ * <p>
+ * } catch (IOException e) {
+ * e.printStackTrace();
+ * return null;
+ * }
+ * }
+ * <p>
+ * <p>
+ * //(데이터 빼올 때 )
+ * public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
+ * //review_id에 해당되는 저장값 가져오도록 repository 호출
+ * ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
+ * try {
+ * Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
+ * //startPlace,endPlace,content,date,member_id(nickname을 구하기 위해서 member_id도 포함)
+ * //Optional이기 때문에 null일 수도 있음.
+ * if (reviewEntity.isPresent()) {
+ * Review review = reviewEntity.get();
+ * String startPlace = review.getStartPlace();
+ * String endPlace = review.getEndPlace();
+ * String content = review.getContent();
+ * LocalDate date = review.getDate();
+ * Long member_id = review.getMember().getMember_id();
+ * <p>
+ * //Optional이기 때문에 null일 수도 있음.
+ * Optional<Member> memberEntity = reviewRepository.detailMember(member_id);
+ * if (memberEntity.isPresent()) {
+ * Member member = memberEntity.get();
+ * String nickname = member.getNickname();
+ * <p>
+ * //return할 dto로 변환
+ * reviewDetailDTO.setStartPlace(startPlace);
+ * reviewDetailDTO.setEndPlace(endPlace);
+ * reviewDetailDTO.setContent(content);
+ * reviewDetailDTO.setDate(date);
+ * reviewDetailDTO.setNickname(nickname);
+ * reviewDetailDTO.setMapUrl(mapUrl);
+ * }
+ * }
+ * } catch (Exception e) {
+ * <p>
+ * return null; //예외처리 구현예정
+ * }
+ * return reviewDetailDTO;
+ * }
+ * <p>
+ * <p>
+ * <p>
+ * }
+ */
