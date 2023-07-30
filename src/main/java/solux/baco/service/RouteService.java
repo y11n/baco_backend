@@ -27,9 +27,8 @@ public class RouteService {
     double[] endNaver = new double[2]; //네이버 호출 시 사용할 도착좌표 double배열
 
 
-
     //전체 메서드 실행 순서을 담고있는 메서드
-    public Map<String, Object> passRouteData(double[] startKakao, double[] endKakao) {
+    public List<List<Double>> passRouteData(double[] startKakao, double[] endKakao) {
         log.info("checkLog:RouteService - passRouteData called with startKakao: {} and endKakao: {}", startKakao, endKakao);
 
         //준비과정(startList/endList를 모두 비어있는 상태로 설정하고, double[]형태인 startKakao/endKakao의 데이터를 List<>형태인 startList/endList에 복사함.
@@ -50,19 +49,13 @@ public class RouteService {
         log.info("checkLog:RouteService - passRouteData called with startList(after loop ): {} and endList(after loop ): {}", startList, endList);
 
 
-
-
         //1.출발,도착좌표 [위도,경도] 순에서 [경도,위도]순으로 변경
         getLngLat(startKakao, endKakao);
 
         //2.네이버 지도 api 호출 후 응답받고 필요한 데이터만 변수에 담는 메서드 호출
         Boolean getRouteResult = getRoute(startNaver, endNaver);
         log.info("checkLog:RouteService - passRouteData called with getRouteResult: {}", getRouteResult);
-        if (getRouteResult == false) {
-            Map<String, Object> failResult = new HashMap<>();
-            failResult.put("error", "출발지와 도착지를 다시 선택해주세요.");
-            return failResult;
-        }
+        //예외처리 예정
         log.info("checkLog:RouteService - passRouteData called with path(before swap): {}", path);
 
         //3. 경로 좌표 [경,위]에서 [위,경] 으로 변환
@@ -70,16 +63,12 @@ public class RouteService {
         log.info("checkLog:RouteService - passRouteData called with path(after  swap): {}", path);
 
         //4.필요한 데이터들을 묶어서 객체형태로 만들기 위한 메서드 호출
-        Map<String, Object> processRouteMap = processRoute();
+        List<List<Double>> processRouteMap = processRoute();
         log.info("checkLog:RouteService - passRouteData called with processRouteMap: {}", processRouteMap);
 
         //5.경로좌표, 출발좌표, 도착좌표 담아서 json형태로 반환.
         return processRouteMap;
     }
-
-
-
-
 
 
     //1. 좌표데이터 순서 바꾸는 메서드
@@ -95,11 +84,6 @@ public class RouteService {
     }
 
 
-
-
-
-
-
     //2. 네이버 지도 API(Direction 5 driving) 활용해서 길찾기 기능 수행 후 결과 얻는 메서드
     //좌표 형태의 출발지,도착지를 얻은 상태로 가정.
     public Boolean getRoute(double[] startCoordinate, double[] endCoordinate) {
@@ -110,7 +94,7 @@ public class RouteService {
 
         String apiUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving"; //네이버 api url
         String clientId = "73qkoqmj6s"; //네이버 지도 api 키 발급 id
-        String clientSecret = "a5WOWVLA6Zv4qq5dTuygaWiBMkcmTt69YT6jWiYa"; //네이버 지도 api 키 발급 pw
+        String clientSecret = "XlBY8sv7BYz2GKkzZ9kFfI4Ry4yV1TqfDPVIAd64"; //네이버 지도 api 키 발급 pw
         double[] startParameter = startCoordinate; //ex-"127.12345, 37.12345"
         double[] endParameter = endCoordinate; //ex-"128.12345,38.12345"
 
@@ -129,7 +113,6 @@ public class RouteService {
                 .bodyToMono(String.class)
                 .block();
         log.info("checkLog:RouteService - getRoute called with response: {}", response);
-
 
 
         //(2)응답 내용 중 필요한 정보 저장
@@ -181,11 +164,6 @@ public class RouteService {
     }
 
 
-
-
-
-
-
     //3. 응답으로 받은 경로좌표List를 [경도,위도] -> [위도,경도] 순으로 변경
     public void swapPath() {
         for (List<Double> coordinate : path) {
@@ -198,13 +176,8 @@ public class RouteService {
     }
 
 
-
-
-
-
-
     //4.필요한 데이터 추출한 멤버변수를 객체형태로 만드는 단계의 메서드
-    public Map<String, Object> processRoute() {
+    public List<List<Double>> processRoute() {
         Map<String, Object> processRouteData = new HashMap<>();
 
         processRouteData.put("start", startResponseList); //출발좌표
@@ -213,7 +186,7 @@ public class RouteService {
         log.info("checkLog:RouteService - processRoute called with startList: {} and endList: {}", startList, endList);
         log.info("checkLog:RouteService - processRoute called with path: {}", path);
 
-        return processRouteData; //Map<String, Object>형태로 반환하면 json으로 받을 수 있음.
+        return path; //내부호출이기 때문에 바로 path를 전달하기로 변경.
     }
 
 }

@@ -65,8 +65,6 @@ public class Review {
         this.date = date;
     }
 
-    //보류 필드
-    //private java.time.LocalTime time;
 
     private String hashtag;
 
@@ -77,6 +75,18 @@ public class Review {
     public void setHashtag(String hashtag) {
         this.hashtag = hashtag;
     }
+
+
+    public String getRoute_point() {
+        return route_point;
+    }
+
+    public void setRoute_point(String route_point) {
+        this.route_point = route_point;
+    }
+
+    private String route_point; //저장 타입 변경될 수도 있음.
+
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -90,17 +100,6 @@ public class Review {
         this.member = member;
     }
 
-    @OneToOne
-    @JoinColumn(name = "route_id")
-    private Route route; //FK
-
-    public Route getRoute() {
-        return route;
-    }
-
-    public void setRoute(Route route) {
-        this.route = route;
-    }
 
 }
 
