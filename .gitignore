@@ -41,4 +41,3 @@ application.properties
 src/main/java/solux/baco/controller/MapTest2Controller.java
 src/main/resources/mapTest2.html
 src/main/resources/templates/html.html
-src/main/resources/templates/mapmap.html
