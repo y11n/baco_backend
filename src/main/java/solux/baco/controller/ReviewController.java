@@ -1,5 +1,6 @@
 package solux.baco.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ import solux.baco.service.RouteModel.JsonDataEntity;
 import solux.baco.service.RouteService;
 import org.springframework.ui.Model;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -59,7 +62,7 @@ public class ReviewController {
     //후기 저장(후기작성)
     @PostMapping("/save")
     @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<ReviewDetailDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<ReviewDetailDTO> saveReviewController( @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
         try {
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
@@ -70,10 +73,7 @@ public class ReviewController {
             String content = reviewData.getContent();
             log.info("checklog: startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
 
-/**경로테스트 시작부분(7/30)*/
-/**
- 후기작성api 호출 시에 RequestBody로 전달된 reviewData를 통해
- 출발지,도착지 장소명을 얻어냈으며, 해당 장소명에 대응하는 좌표값을 찾은 상태라 가정. **/
+
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
             WebClient webClient = WebClient.create();
 
@@ -84,22 +84,25 @@ public class ReviewController {
             //요청 파라미터 설정 => url 쿼리 스트링 파라미터
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
                     .queryParam("start", startParameter[0] + "," + startParameter[1])
-                    .queryParam("goal", endParameter[0] + "," + endParameter[1]);
+                    .queryParam("end", endParameter[0] + "," + endParameter[1]);
 
             //api 호출 후 응답받은 내용을 string 형태로 routePoint에 저장.
-            String routePoint = webClient.get()
+            String routePointString = webClient.get()
                     .uri(uriBuilder.toUriString())
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
+            log.info("checklog: routePoint:{}", routePointString);
+
 
             //html 동적 렌더링 코드 추가 예정. (일단 저장 구현부터..)
 
+            String mapUrl = "테스트 중";
 
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
 
             //ReviewService 호출
-            ReviewDetailDTO reviewDetailDTO =reviewService.saveReview(session, startPlace, endPlace, content, routePoint);
+            ReviewDetailDTO reviewDetailDTO =reviewService.saveReview(startPlace, endPlace, content, routePointString);
             return ResponseEntity.ok(reviewDetailDTO);
 
 /**경로테스트 끝 부분!! (7/30)*

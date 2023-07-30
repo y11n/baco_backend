@@ -12,6 +12,7 @@ import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDetailDTO;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,7 +33,13 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public ReviewDetailDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoints) {
+    public ReviewDetailDTO saveReview(String startPlace, String endPlace, String content, String routePoint) {
+        log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
+        log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
+        log.info("checklog: review.setRoutePoint(routePoint): {}", content);
+        log.info("checklog: review.setRoutePoint(routePoint): {}", routePoint);
+
+
         /**
          //수정된 기능) 서울 내 특정 장소명을 string으로 전달받으면, 데이터가 있는 경우에 한해서 좌표값으로 경로api 호출 후, 경로 저장.
          //이후, 게시글 상세보기 요청이 들어오면 경로데이터를 html에 렌더링해서 html에는 경로가 나타날 거고, 그 html의 url을 프론트엔드로 string형태로 넘긴 후
@@ -42,12 +49,7 @@ public class ReviewService {
         Review review = new Review();
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
         String mapUrl;
-
-
-        //1. 세션에서 이메일 추출하기
-        String email = (String) session.getAttribute("loginEmail");
-        log.info("checklog: loginEmail : {}", email);
-        //전달받은 데이터 예외처리
+        String email ="test2@test.com";
 
 /**
  //memberService의 findEmail메서드를 호출하고,
@@ -66,6 +68,7 @@ public class ReviewService {
             //Optional 객체 속의 요소인 Member객체를 가져오기 위해 .get() //(null이 아닐 때만 get으로 가져올 수 있음.)
             Member member = writerInfo.get();
             //Long member_id = member.getMember_id();
+            log.info("checklog: review.routePoint: {}", routePoint);
 
 
             review.setMember(member); //작성자의 member테이블 레코드 저장
@@ -73,8 +76,8 @@ public class ReviewService {
             review.setStartPlace(startPlace);
             review.setEndPlace(endPlace);
             review.setDate(LocalDate.now());
-            review.setRoutePoint(routePoints); //(7/30)수정-route테이블은 삭제, 후기테이블에 routePoint 컬럼 추가.
-            log.info("checklog: review: {}", review);
+            review.setRoute_point(routePoint); //(7/30)수정-route테이블은 삭제, 후기테이블에 routePoint 컬럼 추가.
+            log.info("checklog: review.setRoutePoint(routePoint): {}", review.getRoute_point());
 
             reviewRepository.save(review);
             mapUrl = "html 동적 렌더링 구현 후 html 주소 저장 예정";

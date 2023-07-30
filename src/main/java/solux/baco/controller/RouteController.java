@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import solux.baco.service.RouteService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -29,7 +30,7 @@ public class RouteController {
 
     // (서버 배포 전)http://localhost:8080/route에 요청파라미터는 start와 end
     @GetMapping("/route")
-    public ResponseEntity<Map<String, Object>> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
+    public List<List<Double>>  getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
         log.info("checkLog:RouteController - getRouteController called with start: {} and end: {}", start, end);
 
         try {
@@ -39,7 +40,7 @@ public class RouteController {
             if (start == null || start.length != 2 || end == null || end.length != 2) {
                 Map<String, Object> failResponse = new HashMap<>();
                 failResponse.put("error", "필수 파라미터가 누락되었거나 잘못되었습니다. (start, end)");
-                return ResponseEntity.badRequest().body(failResponse);
+                return null;
 
             }
 
@@ -50,12 +51,11 @@ public class RouteController {
 
             //정상적인 로직 가능한 경우에 실행되는 부분
             //RouteService 호출
-            return ResponseEntity.ok(routeService.passRouteData(start, end));
+            return (routeService.passRouteData(start, end));
 
         }catch (IllegalArgumentException e) {
-            Map<String, Object> failResponse = new HashMap<>();
-            failResponse.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(failResponse);
+
+            return null;
         }
 
 

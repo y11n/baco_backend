@@ -1,4 +1,5 @@
 package solux.baco.service.ReviewModel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -6,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReviewDetailDTO {
     //게시글 상세보기로 반환할 값 모음
 
