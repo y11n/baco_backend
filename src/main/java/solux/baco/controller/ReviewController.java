@@ -63,7 +63,8 @@ public class ReviewController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<ReviewDetailDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<ReviewDetailDTO> saveReviewController( @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+        //HttpSession session,
         try {
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
@@ -103,7 +104,7 @@ public class ReviewController {
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
 
             //ReviewService 호출
-            ReviewDetailDTO reviewDetailDTO = reviewService.saveReview(session, startPlace, endPlace, content, routePointString);
+            ReviewDetailDTO reviewDetailDTO = reviewService.saveReview(startPlace, endPlace, content, routePointString); //session, 
             return ResponseEntity.ok(reviewDetailDTO);
 
 
