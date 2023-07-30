@@ -1,11 +1,11 @@
 package solux.baco.service.ReviewModel;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
+@Component
 public class ReviewDetailDTO {
     //게시글 상세보기로 반환할 값 모음
 
