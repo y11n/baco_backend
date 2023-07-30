@@ -60,7 +60,7 @@ public class ReviewController {
     }
 
 
-    //후기 저장(후기작성)
+    //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody //반환 타입을 바꿔야할지?
     public ResponseEntity<ReviewDetailDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
