@@ -15,7 +15,11 @@ public class MemberRepository {
     private EntityManager em;
 
     public void save(Member member){
-        em.persist(member);
+        if(member.getMember_id() == null){
+            em.persist(member);
+        } else { //이미 DB에 등록되어 있을 경우
+            em.merge(member);
+        }
     }
 
     //id => member_id로 변경(7/26)
