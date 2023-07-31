@@ -14,6 +14,7 @@ import solux.baco.domain.Review;
 import solux.baco.service.MemberService;
 import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.ReviewModel.ReviewDetailDTO;
+import solux.baco.service.ReviewModel.returnReviewDataDTO;
 import solux.baco.service.ReviewService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,14 @@ import java.util.Optional;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final returnReviewDataDTO returnReviewDataDTO;
     private final ReviewDetailDTO reviewDetailDTO;
     private final JsonDataEntity jsonDataEntity;
 
     @Autowired
-    public ReviewController(ReviewService reviewService, ReviewDetailDTO reviewDetailDTO, JsonDataEntity jsonDataEntity) {
+    public ReviewController(ReviewService reviewService, returnReviewDataDTO returnReviewDataDTO, ReviewDetailDTO reviewDetailDTO, JsonDataEntity jsonDataEntity) {
         this.reviewService = reviewService;
+        this.returnReviewDataDTO = returnReviewDataDTO;
         this.reviewDetailDTO = reviewDetailDTO;
         this.jsonDataEntity = jsonDataEntity;
 
@@ -62,7 +65,7 @@ public class ReviewController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<ReviewDetailDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<returnReviewDataDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
         try {
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
@@ -102,8 +105,8 @@ public class ReviewController {
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
 
             //ReviewService 호출
-            ReviewDetailDTO reviewDetailDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString);
-            return ResponseEntity.ok(reviewDetailDTO);
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString);
+            return ResponseEntity.ok(returnReviewDataDTO);
 
 
         } catch (Exception e) {

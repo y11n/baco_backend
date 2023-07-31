@@ -11,6 +11,7 @@ import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDetailDTO;
+import solux.baco.service.ReviewModel.returnReviewDataDTO;
 import solux.baco.service.RouteModel.JsonDataEntity;
 
 import java.io.IOException;
@@ -26,18 +27,20 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final MemberService memberService;
+    private final ReviewDetailDTO reviewDetailDTO;
 
 
-    public ReviewService(ReviewRepository reviewRepository, MemberService memberService) {
+    public ReviewService(ReviewRepository reviewRepository, MemberService memberService, ReviewDetailDTO reviewDetailDTO) {
 
         this.reviewRepository = reviewRepository;
         this.memberService = memberService;
+        this.reviewDetailDTO = reviewDetailDTO;
     }
 
 
     //데이터 저장할 때
     @Transactional
-    public ReviewDetailDTO saveReview( HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
+    public returnReviewDataDTO saveReview( HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
         log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", content);
@@ -45,7 +48,7 @@ public class ReviewService {
 
 
         Review review = new Review();
-        ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
+        returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
         String mapUrl;
 
         //1. 세션에서 이메일 추출하기
@@ -77,15 +80,15 @@ public class ReviewService {
             reviewRepository.save(review);
             mapUrl = "html 동적 렌더링 구현 후 html 주소 저장 예정";
 
-            reviewDetailDTO.setStartPlace(review.getStartPlace());
-            reviewDetailDTO.setEndPlace(review.getEndPlace());
-            reviewDetailDTO.setContent(review.getContent());
-            reviewDetailDTO.setMapUrl(mapUrl);
+            returnReviewDataDTO.setStartPlace(review.getStartPlace());
+            returnReviewDataDTO.setEndPlace(review.getEndPlace());
+            returnReviewDataDTO.setContent(review.getContent());
+            returnReviewDataDTO.setMapUrl(mapUrl);
 
         } else {
             mapUrl = "실패";
         }
-        return reviewDetailDTO;
+        return returnReviewDataDTO;
     }
 
 
@@ -131,10 +134,11 @@ public class ReviewService {
 
     //(데이터 빼올 때 )
     public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
+        ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
+
         log.info("checklog: ReviewService_reviewDetail-review_id: {}", review_id);
 
         //review_id에 해당되는 저장값 가져오도록 repository 호출
-        ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
         try {
             Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
             log.info("checklog: ReviewService_reviewDetail-reviewEntity: {}", reviewEntity);
@@ -143,12 +147,12 @@ public class ReviewService {
             // Optional이기 때문에 null일 수도 있음.
             if (reviewEntity.isPresent()) {
                 Review review = reviewEntity.get();
-                String startPlace = review.getStartPlace();
-                String endPlace = review.getEndPlace();
+                //String startPlace = review.getStartPlace();
+                //String endPlace = review.getEndPlace();
                 String content = review.getContent();
                 Long member_id = review.getMember().getMember_id();
-                log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
-                log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
+                //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
+                //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
                 log.info("checklog: ReviewService_reviewDetail-content: {}", content);
                 log.info("checklog: ReviewService_reviewDetail-member_id: {}", member_id);
 
@@ -161,10 +165,9 @@ public class ReviewService {
                     String nickname = member.getNickname();
 */
                     //return할 dto로 변환
-                    reviewDetailDTO.setStartPlace(startPlace);
-                    reviewDetailDTO.setEndPlace(endPlace);
-                    reviewDetailDTO.setContent(content);
-                    reviewDetailDTO.setMapUrl(mapUrl);
+
+                reviewDetailDTO.setContent(content);
+                reviewDetailDTO.setMapUrl(mapUrl);
                 }
 
         } catch (Exception e) {

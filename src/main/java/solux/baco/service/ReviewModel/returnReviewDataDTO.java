@@ -8,14 +8,24 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReviewDetailDTO{
+public class returnReviewDataDTO {
     //게시글 상세보기로 반환할 값 모음
 
+    public void setStartPlace(String startPlace) {
+        this.startPlace = startPlace;
+    }
+
+    public void setEndPlace(String endPlace) {
+        this.endPlace = endPlace;
+    }
 
     public void setContent(String content) {
         this.content = content;
     }
 
+    private String startPlace;
+
+    private String endPlace;
 
     private String content;
 
