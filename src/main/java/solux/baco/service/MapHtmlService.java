@@ -40,7 +40,7 @@ public class MapHtmlService {
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview(  String startPlace, String endPlace, String content, String routePoint) {
+    public returnReviewDataDTO saveReview(String startPlace, String endPlace, String content, String routePoint) {
         log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", content);
@@ -89,40 +89,28 @@ public class MapHtmlService {
     }
 
 
-
-
-
-
-    /**상세조회 관련 메서드*/
-
-
+    /**
+     * 상세조회 관련 메서드
+     */
 
 
     //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
-    public JsonDataEntity getJsonData(Long review_id) {
-        log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
+    public String getJsonData(Long review_id) {
+        log.info("checklog: MapHtmlService_getJsonData");
 
-        //review_id로 review레코드를 찾아서 route_id를 빼와야하고,
-        // route_id로 다시 routePoint를 빼와야함.
-        // routePoint는 JsonDataEntity구조와 매핑돼서 객체형태로 저장한 후 controller->html로 전달됨.
         try {
-            log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
             String routePointString = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
-            log.info("checklog: ReviewService_getJsonData-routePoint: {}", routePointString);
+            log.info("checklog: MapHtmlService_getJsonData-routePoint: {}", routePointString);
+            //checklog: ReviewService_getJsonData-routePoint: [[37.5668417,126.978588], ... ,[37.5754594,126.9761248]]
 
-            Map<String,Object> makeJson = new HashMap<>();
+
+            Map<String, Object> makeJson = new HashMap<>();
             makeJson.put("route_point", routePointString);
 
             ObjectMapper objectMapper = new ObjectMapper();
             routePointString = objectMapper.writeValueAsString(makeJson);
-
-            //makeJson을 객체로 바꾸기.
-            JsonDataEntity routePointList = objectMapper.readValue(routePointString,JsonDataEntity.class);
-
-            log.info("checklog: ReviewService_getJsonData-routePointList: {}", routePointList);
-
-            return routePointList; //일단 controller로 다시 반환 (html 동적 렌더링을 하기 위해서)
-
+             return routePointString; //일단 controller로 다시 반환 (html 동적 렌더링을 하기 위해서)
+//checklog: ReviewService_getJsonData-routePointString: {"route_point":"[[37.5668417,126.978588]], ... ,[37.5754594,126.9761248]]"} => 이 형태가 html에서 파싱 더 편리.
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -132,15 +120,13 @@ public class MapHtmlService {
     //(데이터 빼올 때 )
     public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
-
-        log.info("checklog: ReviewService_reviewDetail-review_id: {}", review_id);
+        log.info("checklog: MapHtmlService_reviewDetail-review_id: {},mapUrl: {}", review_id, mapUrl);
 
         //review_id에 해당되는 저장값 가져오도록 repository 호출
         try {
             Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
-            log.info("checklog: ReviewService_reviewDetail-reviewEntity: {}", reviewEntity);
+            log.info("checklog: MapHtmlService_reviewDetail-reviewEntity: {}", reviewEntity);
 
-            //startPlace,endPlace,content,date,member_id(nickname을 구하기 위해서 member_id도 포함)
             // Optional이기 때문에 null일 수도 있음.
             if (reviewEntity.isPresent()) {
                 Review review = reviewEntity.get();
@@ -148,19 +134,9 @@ public class MapHtmlService {
                 //String endPlace = review.getEndPlace();
                 String content = review.getContent();
                 Long member_id = review.getMember().getMember_id();
-                //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
-                //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
-                log.info("checklog: ReviewService_reviewDetail-content: {}", content);
-                log.info("checklog: ReviewService_reviewDetail-member_id: {}", member_id);
+                log.info("checklog: MapHtmlService_reviewDetail-content: {}", content);
+                log.info("checklog: MapHtmlService_reviewDetail-member_id: {}", member_id);
 
-
-/**
- //Optional이기 때문에 null일 수도 있음.
- Optional<Member> memberEntity = reviewRepository.detailMember(member_id);
- if (memberEntity.isPresent()) {
- Member member = memberEntity.get();
- String nickname = member.getNickname();
- */
                 //return할 dto로 변환
 
                 reviewDetailDTO.setContent(content);

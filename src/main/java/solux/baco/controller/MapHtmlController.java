@@ -66,7 +66,7 @@ public class MapHtmlController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<returnReviewDataDTO> saveReviewController( @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<returnReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
         try {
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
@@ -75,15 +75,15 @@ public class MapHtmlController {
             String startPlace = reviewData.getStartPlace();
             String endPlace = reviewData.getEndPlace();
             String content = reviewData.getContent();
-            log.info("checklog: startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
+            log.info("checklog: MapHtmlController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
 
 
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
             WebClient webClient = WebClient.create();
 
             String apiUrl = "http://localhost:8080/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
-            double[] startParameter = {37.56640973022008, 126.97857314414601}; //ex-"127.12345, 37.12345"
-            double[] endParameter = {37.57621220811897, 126.97672509786915}; //ex-"128.12345,38.12345"
+            double[] startParameter = {37.54167, 126.964930}; //ex-"127.12345, 37.12345"
+            double[] endParameter = {37.528409, 126.933089}; //ex-"128.12345,38.12345"
 
             //요청 파라미터 설정 => url 쿼리 스트링 파라미터
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
@@ -96,13 +96,12 @@ public class MapHtmlController {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            log.info("checklog: routePoint:{}", routePointString);
+            log.info("checklog: MapHtmlController_saveReviewController-routePoint:{}", routePointString);
 
 
             //html 동적 렌더링 코드 추가 예정. (일단 저장 구현부터..)
-
             String mapUrl = "테스트 중";
-
+            log.info("checklog: MapHtmlController_saveReviewController-mapUrl: {}", mapUrl);
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
 
             //ReviewService 호출
@@ -122,24 +121,45 @@ public class MapHtmlController {
     //후기 게시글 상세 조회
     @GetMapping("/detail/{review_id}")
     public ReviewDetailDTO reviewDetailContriller(@PathVariable Long review_id, Model model) {
+        log.info("checklog: MapHtmlController_reviewDetailController");
         try {
             String mapUrl;
             //예외처리 구현 예정
 
-            JsonDataEntity jsonData = mapHtmlService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
+            //String jsonData = mapHtmlService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
+
+            String jsonData = mapHtmlService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
+            log.info("checklog: MapHtmlController_reviewDetailController-jsonData:{}", jsonData);
             if (jsonData != null) {
 
-                //JsonData를 html에 렌더링하기 위해 Thymeleaf 템플릿으로 전달. (=Thymeleaf를 통해 html로 전달)
-                model.addAttribute("jsonData", jsonDataEntity.getRoutePoint()); //jsonDTO형태로 맞춰서 저장했다가 getter메서드로 가져와서 model로 전달하기.
-                log.info("checklog: ReviewController_reviewDetailContriller-model.addAttribute");
-                //html 렌더링 성공하면 =>
-                String serverUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/";
-                mapUrl = serverUrl + "mapTest"; //변경예정
-                log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", mapUrl);
-            } else {
+/**
+ //JsonData를 html에 렌더링하기 위해 Thymeleaf 템플릿으로 전달. (=Thymeleaf를 통해 html로 전달)
+ model.addAttribute("jsonData", jsonDataEntity.getRoutePoint()); //jsonDTO형태로 맞춰서 저장했다가 getter메서드로 가져와서 model로 전달하기.
+ */
 
+                //html에 동적으로 렌더링하는 api를 호출 (MapTestController)
+                WebClient webClient = WebClient.create();
+
+                String apiUrl = "http://localhost:8080/mapTest"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
+
+                String mapTest = webClient.post()
+                        .uri(apiUrl)
+                        .bodyValue(jsonData) // 요청 본문에 jsonData 객체를 담아서 보냄
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();
+                log.info("checklog: MapHtmlController_reviewDetailController-mapTest:{}", mapTest);
+
+                //페이지 반환 성공하면
+                mapUrl = "http://localhost:8080/mapTest";
+
+                //html 렌더링 성공하면 =>
+                //String serverUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/";
+                //mapUrl = serverUrl + "mapTest"; //변경예정
+                log.info("checklog: MapHtmlController_reviewDetailController-mapUrl:{}", mapUrl);
+            } else {
                 mapUrl = "테스트 url";
-                log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", mapUrl);
+                log.info("checklog: MapHtmlController_reviewDetailController-mapUrl:{}", mapUrl);
             }
             //review_id로 상세조회 시 필요한 데이터들 객체형태로 가져오는 service 메서드 호출.
             ReviewDetailDTO reviewDetail = mapHtmlService.reviewDetail(review_id, mapUrl);
