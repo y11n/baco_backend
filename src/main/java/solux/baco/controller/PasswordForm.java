@@ -13,4 +13,7 @@ public class PasswordForm {
     @NotEmpty
     private String newPasswordConfirm;
 
+    @NotEmpty
+    private String newNickname;
+
 }
