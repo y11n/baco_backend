@@ -29,6 +29,8 @@ public class ReviewRepository {
     }
 
 
+
+    /**후기 저장 메서드*/
     //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
     public Optional<Review> save(Review review) {
 
@@ -47,6 +49,17 @@ public class ReviewRepository {
         jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(), review.getRoute_point());
 
         return Optional.ofNullable(review);
+    }
+
+
+
+
+
+    /**r후기 상세 조회 관련 메서드*/
+    public String routeData(Long review_id) {
+        Review review = entityManager.find(Review.class,review_id);
+        String routeData = review.getRoute_point();
+        return routeData;
     }
 
 
