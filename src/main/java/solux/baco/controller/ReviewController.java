@@ -80,7 +80,7 @@ public class ReviewController {
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
             WebClient webClient = WebClient.create();
 
-            String apiUrl = "http://localhost:8080/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
+            String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
             double[] startParameter = {37.56640973022008, 126.97857314414601}; //ex-"127.12345, 37.12345"
             double[] endParameter = {37.57621220811897, 126.97672509786915}; //ex-"128.12345,38.12345"
 
