@@ -1,5 +1,6 @@
 package solux.baco.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class Member {
     private String nickname;
 
     @OneToMany(mappedBy = "member") //회원 고유 식별자로 후기를 찾아야해서 mappedBy ="member"
+    @JsonIgnore
     private List<Review> review; //FK
 
     //비밀번호 검증
