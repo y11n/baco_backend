@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
@@ -13,7 +14,7 @@ import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDetailDTO;
 import solux.baco.service.ReviewModel.returnReviewDataDTO;
 import solux.baco.service.RouteModel.JsonDataEntity;
-
+import org.json.JSONArray;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -100,18 +101,19 @@ public class MapHtmlService {
 
         try {
             String routePointString = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
-            log.info("checklog: MapHtmlService_getJsonData-routePoint: {}", routePointString);
+            log.info("checklog: MapHtmlService_getJsonData-routePointString: {}", routePointString);
             //checklog: ReviewService_getJsonData-routePoint: [[37.5668417,126.978588], ... ,[37.5754594,126.9761248]]
 
-
+/**
             Map<String, Object> makeJson = new HashMap<>();
-            makeJson.put("route_point", routePointString);
+            makeJson.put("path", routePointString);
 
             ObjectMapper objectMapper = new ObjectMapper();
             routePointString = objectMapper.writeValueAsString(makeJson);
-             return routePointString; //일단 controller로 다시 반환 (html 동적 렌더링을 하기 위해서)
+*/
+            return routePointString; //일단 controller로 다시 반환 (html 동적 렌더링을 하기 위해서)
 //checklog: ReviewService_getJsonData-routePointString: {"route_point":"[[37.5668417,126.978588]], ... ,[37.5754594,126.9761248]]"} => 이 형태가 html에서 파싱 더 편리.
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -149,5 +151,20 @@ public class MapHtmlService {
         }
         return reviewDetailDTO;
     }
+
+
+    public Double[][] makeArray(String jsonData) {
+        JSONArray jsonArray = new JSONArray(jsonData);
+        Double[][] jsonDataArray = new Double[jsonArray.length()][2];
+
+        for (int i = 0; i<jsonArray.length(); i++) {
+            JSONArray innerArray = jsonArray.getJSONArray(i);
+            jsonDataArray[i][0] = innerArray.getDouble(0);
+            jsonDataArray[i][1] = innerArray.getDouble(1);
+        }
+
+        return jsonDataArray;
+    }
 }
+
 

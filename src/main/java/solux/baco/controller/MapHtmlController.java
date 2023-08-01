@@ -126,41 +126,33 @@ public class MapHtmlController {
             String mapUrl;
             //예외처리 구현 예정
 
-            //String jsonData = mapHtmlService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
 
-            String jsonData = mapHtmlService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
-            log.info("checklog: MapHtmlController_reviewDetailController-jsonData:{}", jsonData);
-            if (jsonData != null) {
+            //html에 동적으로 렌더링하는 api를 호출 (MapTestController)
+            WebClient webClient = WebClient.create();
 
-/**
- //JsonData를 html에 렌더링하기 위해 Thymeleaf 템플릿으로 전달. (=Thymeleaf를 통해 html로 전달)
- model.addAttribute("jsonData", jsonDataEntity.getRoutePoint()); //jsonDTO형태로 맞춰서 저장했다가 getter메서드로 가져와서 model로 전달하기.
- */
+            String apiUrl = "http://localhost:8080/mapTest"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
 
-                //html에 동적으로 렌더링하는 api를 호출 (MapTestController)
-                WebClient webClient = WebClient.create();
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
+                    .queryParam("review_id", review_id);
 
-                String apiUrl = "http://localhost:8080/mapTest"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
+            String mapTest = webClient.get()
+                    .uri(uriBuilder.toUriString())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            log.info("checklog: MapHtmlController_reviewDetailController-mapTest:{}", mapTest);
 
-                String mapTest = webClient.post()
-                        .uri(apiUrl)
-                        .bodyValue(jsonData) // 요청 본문에 jsonData 객체를 담아서 보냄
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block();
-                log.info("checklog: MapHtmlController_reviewDetailController-mapTest:{}", mapTest);
+            //페이지 반환 성공하면
+            mapUrl = "http://localhost:8080/mapTest"; //수정 예정
 
-                //페이지 반환 성공하면
-                mapUrl = "http://localhost:8080/mapTest";
-
-                //html 렌더링 성공하면 =>
-                //String serverUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/";
-                //mapUrl = serverUrl + "mapTest"; //변경예정
-                log.info("checklog: MapHtmlController_reviewDetailController-mapUrl:{}", mapUrl);
-            } else {
-                mapUrl = "테스트 url";
-                log.info("checklog: MapHtmlController_reviewDetailController-mapUrl:{}", mapUrl);
-            }
+            //html 렌더링 성공하면 =>
+            //String serverUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/";
+            //mapUrl = serverUrl + "mapTest"; //변경예정
+            log.info("checklog: MapHtmlController_reviewDetailController-mapUrl:{}", mapUrl);
+            // else {
+            //mapUrl = "테스트 url";
+            //log.info("checklog: MapHtmlController_reviewDetailController-mapUrl:{}", mapUrl);
+            //}
             //review_id로 상세조회 시 필요한 데이터들 객체형태로 가져오는 service 메서드 호출.
             ReviewDetailDTO reviewDetail = mapHtmlService.reviewDetail(review_id, mapUrl);
             //log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", review_id);
