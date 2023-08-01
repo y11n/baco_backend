@@ -1,7 +1,6 @@
 //origin/develop merge 테스트
 package solux.baco.service;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -21,8 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import java.util.List;
+
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -90,9 +92,6 @@ public class ReviewService {
         }
         return returnReviewDataDTO;
     }
-
-
-
 
 
 
@@ -176,5 +175,19 @@ public class ReviewService {
         }
         return reviewDetailDTO;
     }
+  
+    
+    public Review findReview(Long reviewId){
+        return reviewRepository.findOne(reviewId);
+    }
+
+    public List<Review> findReviews(Long memberId) {
+        return reviewRepository.findMemberReviews(memberId);
+    }
+
+    public List<Review> findHashtagReviews(String hashtag) {
+        return reviewRepository.findHashtagReviews(hashtag);
+    }
+
 }
 

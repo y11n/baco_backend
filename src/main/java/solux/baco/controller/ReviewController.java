@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/Review")
@@ -159,5 +161,10 @@ public class ReviewController {
     return reviewDetailDTO; //수정해야할 듯.
     }
 
+    //해시태그 필터링
+    @GetMapping("/reviews")
+    public List<Review> showReviews_hashtag(@RequestParam String hashtag){
+        return reviewService.findHashtagReviews(hashtag);
+    }
 
 }
