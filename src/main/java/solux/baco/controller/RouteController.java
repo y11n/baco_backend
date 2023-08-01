@@ -28,13 +28,12 @@ public class RouteController {
         this.routeService = routeService;
     }
 
-    // (서버 배포 전)http://localhost:8080/route에 요청파라미터는 start와 end
+
     @GetMapping("/route")
     public List<List<Double>> getRouteController(@RequestParam double[] start, @RequestParam double[] end) {
         log.info("checkLog:RouteController - getRouteController called with start: {} and end: {}", start, end);
 
         try {
-            log.info("checkLog:RouteController in try");
 
             //예외처리 => 이어서 진행 예정
             if (start == null || start.length != 2 || end == null || end.length != 2) {

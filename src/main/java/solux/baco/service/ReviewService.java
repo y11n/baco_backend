@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.repository.ReviewRepository;
@@ -42,33 +45,32 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview( HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
-        log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
-        log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
-        log.info("checklog: review.setRoutePoint(routePoint): {}", content);
-        log.info("checklog: review.setRoutePoint(routePoint): {}", routePoint);
+    public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) { //
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", startPlace);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", endPlace);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", content);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", routePoint);
 
 
         Review review = new Review();
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
-        String mapUrl;
 
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
-        log.info("checklog: loginEmail : {}", email);
+        log.info("checklog: ReviewService_saveReview-loginEmail : {}", email);
         //전달받은 데이터 예외처리
-        log.info("checklog: ReviewService");
+        log.info("checklog: ReviewService_saveReview-ReviewService");
 
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
-        log.info("checklog: writerInfo: {}", writerInfo);
+        log.info("checklog: ReviewService_saveReview-writerInfo: {}", writerInfo);
 
         //3. 받아온 Member객체를 통해서 member_id 추출하기
         if (writerInfo.isPresent()) {
             //Optional 객체 속의 요소인 Member객체를 가져오기 위해 .get() //(null이 아닐 때만 get으로 가져올 수 있음.)
             Member member = writerInfo.get();
             //Long member_id = member.getMember_id();
-            log.info("checklog: review.routePoint: {}", routePoint);
+            log.info("checklog: ReviewService_saveReview-review.routePoint: {}", routePoint);
 
 
             review.setMember(member); //작성자의 member테이블 레코드 저장
@@ -77,18 +79,18 @@ public class ReviewService {
             review.setEndPlace(endPlace);
             review.setDate(LocalDate.now());
             review.setRoute_point(routePoint); //(7/30)수정-route테이블은 삭제, 후기테이블에 routePoint 컬럼 추가.
-            log.info("checklog: review.setRoutePoint(routePoint): {}", review.getRoute_point());
 
-            reviewRepository.save(review);
-            mapUrl = "html 동적 렌더링 구현 후 html 주소 저장 예정";
+            log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", review.getRoute_point());
+
+            Long review_id = reviewRepository.save(review);
 
             returnReviewDataDTO.setStartPlace(review.getStartPlace());
             returnReviewDataDTO.setEndPlace(review.getEndPlace());
             returnReviewDataDTO.setContent(review.getContent());
-            returnReviewDataDTO.setMapUrl(mapUrl);
+            returnReviewDataDTO.setReview_id(review_id);
 
         } else {
-            mapUrl = "실패";
+          return null;
         }
         return returnReviewDataDTO;
     }
@@ -101,31 +103,15 @@ public class ReviewService {
 
 
     //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
-    public JsonDataEntity getJsonData(Long review_id) {
-        log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
+    public String getJsonData(Long review_id) {
+        log.info("checklog: ReviewService_getJsonData");
 
-        //review_id로 review레코드를 찾아서 route_id를 빼와야하고,
-        // route_id로 다시 routePoint를 빼와야함.
-        // routePoint는 JsonDataEntity구조와 매핑돼서 객체형태로 저장한 후 controller->html로 전달됨.
         try {
-            log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
             String routePointString = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
-            log.info("checklog: ReviewService_getJsonData-routePoint: {}", routePointString);
+            log.info("checklog: ReviewService_getJsonData-routePointString: {}", routePointString);
 
-            Map<String,Object> makeJson = new HashMap<>();
-            makeJson.put("route_point", routePointString);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            routePointString = objectMapper.writeValueAsString(makeJson);
-
-            //makeJson을 객체로 바꾸기.
-            JsonDataEntity routePointList = objectMapper.readValue(routePointString,JsonDataEntity.class);
-
-            log.info("checklog: ReviewService_getJsonData-routePointList: {}", routePointList);
-
-            return routePointList; //일단 controller로 다시 반환 (html 동적 렌더링을 하기 위해서)
-
-        } catch (IOException e) {
+            return routePointString;
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -134,40 +120,35 @@ public class ReviewService {
     //(데이터 빼올 때 )
     public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
-
-        log.info("checklog: ReviewService_reviewDetail-review_id: {}", review_id);
+        log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
 
         //review_id에 해당되는 저장값 가져오도록 repository 호출
         try {
             Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
-            log.info("checklog: ReviewService_reviewDetail-reviewEntity: {}", reviewEntity);
+            log.info("checklog: ReviewService_getJsonData-reviewEntity: {}", reviewEntity);
 
-            //startPlace,endPlace,content,date,member_id(nickname을 구하기 위해서 member_id도 포함)
-            // Optional이기 때문에 null일 수도 있음.
+                // Optional이기 때문에 null일 수도 있음.
             if (reviewEntity.isPresent()) {
                 Review review = reviewEntity.get();
                 //String startPlace = review.getStartPlace();
                 //String endPlace = review.getEndPlace();
                 String content = review.getContent();
-                Long member_id = review.getMember().getMember_id();
-                //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
-                //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
-                log.info("checklog: ReviewService_reviewDetail-content: {}", content);
-                log.info("checklog: ReviewService_reviewDetail-member_id: {}", member_id);
+                //Long member_id = review.getMember().getMember_id();
 
 
-/**
-                //Optional이기 때문에 null일 수도 있음.
-                Optional<Member> memberEntity = reviewRepository.detailMember(member_id);
-                if (memberEntity.isPresent()) {
-                    Member member = memberEntity.get();
-                    String nickname = member.getNickname();
-*/
-                    //return할 dto로 변환
 
                 reviewDetailDTO.setContent(content);
                 reviewDetailDTO.setMapUrl(mapUrl);
-                }
+                //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
+                //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
+                log.info("checklog: ReviewService_getJsonData-content: {}", content);
+                log.info("checklog: ReviewService_getJsonData-mapUrl: {}", mapUrl);
+
+
+
+
+
+            }
 
         } catch (Exception e) {
 
@@ -189,5 +170,20 @@ public class ReviewService {
         return reviewRepository.findHashtagReviews(hashtag);
     }
 
+
+    public Double[][] makeArray(String jsonData) {
+        log.info("checklog: ReviewService_makeArray");
+
+        JSONArray jsonArray = new JSONArray(jsonData);
+        Double[][] jsonDataArray = new Double[jsonArray.length()][2];
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONArray innerArray = jsonArray.getJSONArray(i);
+            jsonDataArray[i][0] = innerArray.getDouble(0);
+            jsonDataArray[i][1] = innerArray.getDouble(1);
+        }
+        log.info("checklog: ReviewService_makeArray-jsonDataArray:{}",jsonDataArray);
+        return jsonDataArray;
+    }
 }
 

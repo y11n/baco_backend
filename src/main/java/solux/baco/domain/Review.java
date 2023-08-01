@@ -26,6 +26,7 @@ public class Review {
         this.review_id = review_id;
     }
 
+
     private String startPlace;
 
     public String getStartPlace() {
@@ -35,6 +36,7 @@ public class Review {
     public void setStartPlace(String startPlace) {
         this.startPlace = startPlace;
     }
+
 
     private String endPlace;
 
@@ -46,6 +48,7 @@ public class Review {
         this.endPlace = endPlace;
     }
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     public String getContent() {
@@ -55,6 +58,7 @@ public class Review {
     public void setContent(String content) {
         this.content = content;
     }
+
 
     private java.time.LocalDate date;
 
@@ -78,17 +82,15 @@ public class Review {
     }
 
 
+    @Column(columnDefinition = "TEXT")
+    private String route_point;
     public String getRoute_point() {
         return route_point;
     }
-
     public void setRoute_point(String route_point) {
         this.route_point = route_point;
     }
 
-
-    @Column(length=10000)
-    private String route_point; //저장 타입 변경될 수도 있음.
 
 
     @ManyToOne
