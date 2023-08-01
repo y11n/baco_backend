@@ -2,14 +2,22 @@
 package solux.baco.service;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import solux.baco.domain.Review;
+import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDTO;
+
+import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ReviewService {
 
+    private final ReviewRepository reviewRepository;
     public void saveReview(double[] start, double[] end, ReviewDTO reviewData) {
 
         //1.경로 좌표 반환 api 호출해서 경로좌표,(경로기준)출발좌표,(경로기준)도착좌표 받아오기=>저장할 데이터 준비 완료
@@ -18,6 +26,18 @@ public class ReviewService {
 
         //3.응답 반환
 
+    }
+
+    public Review findReview(Long reviewId){
+        return reviewRepository.findOne(reviewId);
+    }
+
+    public List<Review> findReviews(Long memberId) {
+        return reviewRepository.findMemberReviews(memberId);
+    }
+
+    public List<Review> findHashtagReviews(String hashtag) {
+        return reviewRepository.findHashtagReviews(hashtag);
     }
 
 }

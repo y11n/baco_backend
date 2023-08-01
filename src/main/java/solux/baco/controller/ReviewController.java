@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import solux.baco.domain.Review;
 import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.ReviewService;
 import org.springframework.http.HttpStatusCode;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.ReviewService;
 import solux.baco.service.RouteService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -62,5 +65,10 @@ public class ReviewController {
 
     //작성글 조회
 
+    //해시태그 필터링
+    @GetMapping("/reviews")
+    public List<Review> showReviews_hashtag(@RequestParam String hashtag){
+        return reviewService.findHashtagReviews(hashtag);
+    }
 
 }
