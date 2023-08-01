@@ -31,4 +31,6 @@ public class ReviewDetailDTO{
     //7/30 추가
     private String mapUrl;
 
+
+
 }

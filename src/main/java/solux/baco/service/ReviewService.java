@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.repository.ReviewRepository;
@@ -41,7 +43,7 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
+    public returnReviewDataDTO saveReview( String startPlace, String endPlace, String content, String routePoint) { //HttpSession session,
         log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", content);
@@ -50,7 +52,17 @@ public class ReviewService {
 
         Review review = new Review();
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
-        String mapUrl;
+
+
+
+
+
+
+
+
+
+
+
 
         String email = "test@test.com"; //테스트 용 더미데이터
 
@@ -79,18 +91,18 @@ public class ReviewService {
             review.setEndPlace(endPlace);
             review.setDate(LocalDate.now());
             review.setRoute_point(routePoint); //(7/30)수정-route테이블은 삭제, 후기테이블에 routePoint 컬럼 추가.
+
             log.info("checklog: review.setRoutePoint(routePoint): {}", review.getRoute_point());
 
-            reviewRepository.save(review);
-            mapUrl = "html 동적 렌더링 구현 후 html 주소 저장 예정";
+            Long review_id = reviewRepository.save(review);
 
             returnReviewDataDTO.setStartPlace(review.getStartPlace());
             returnReviewDataDTO.setEndPlace(review.getEndPlace());
             returnReviewDataDTO.setContent(review.getContent());
-            returnReviewDataDTO.setMapUrl(mapUrl);
+            returnReviewDataDTO.setReview_id(review_id);
 
         } else {
-            mapUrl = "실패";
+          return null;
         }
         return returnReviewDataDTO;
     }

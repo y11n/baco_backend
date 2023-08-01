@@ -12,9 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.service.MemberService;
-import solux.baco.service.ReviewModel.ReviewDTO;
-import solux.baco.service.ReviewModel.ReviewDetailDTO;
-import solux.baco.service.ReviewModel.returnReviewDataDTO;
+import solux.baco.service.ReviewModel.*;
 import solux.baco.service.ReviewService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -65,8 +63,10 @@ public class ReviewController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<returnReviewDataDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<SavedReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+        //HttpSession session,
         try {
+            String mapUrl;
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
 
@@ -81,8 +81,8 @@ public class ReviewController {
             WebClient webClient = WebClient.create();
 
             String apiUrl = "http://localhost:8080/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
-            double[] startParameter = {37.549785,127.081546}; //ex-"127.12345, 37.12345"
-            double[] endParameter = {37.545020,127.040982}; //ex-"128.12345,38.12345"
+            double[] startParameter = {37.568403,126.896931}; //ex-"127.12345, 37.12345"
+            double[] endParameter = {37.549180,126.989704}; //ex-"128.12345,38.12345"
 
             //요청 파라미터 설정 => url 쿼리 스트링 파라미터
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
@@ -97,25 +97,53 @@ public class ReviewController {
                     .block();
             log.info("checklog: routePoint:{}", routePointString);
 
-/**
-            //mapTest를 분리해서 api 새로?
-            //아니면 review_id를 다시 구해와서 html 렌더링?
-   */
-
-
-            //html 동적 렌더링 코드 추가 예정. (일단 저장 구현부터..)
-            String mapUrl = "테스트 중";
-            log.info("checklog: MapHtmlController_saveReviewController-mapUrl: {}", mapUrl);
-
-
-
 
 
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
-
             //ReviewService 호출
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString);
-            return ResponseEntity.ok(returnReviewDataDTO);
+            //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(startPlace, endPlace, content, routePointString); //session,
+
+            //review_id 구하기
+            //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!
+            //String savedRoutePoint = reviewService.getRoutePointString(review_id);
+            Long review_id = returnReviewDataDTO.getReview_id();
+
+
+
+            //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
+            WebClient webClient_map = WebClient.create();
+
+            String apiUrl_map = "http://localhost:8080/mapConfirm"; //서버 배포 시 url 변경 예정
+
+            UriComponentsBuilder uriBuilder_map = UriComponentsBuilder.fromUriString(apiUrl_map)
+                    .queryParam("review_id", review_id);
+
+            String mapTest = webClient_map.get()
+                    .uri(uriBuilder_map.toUriString())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+
+            //html 경로 표시 성공하면
+            //html에 경로 표시하기 성공하면
+            mapUrl = "http://localhost:8080/mapConfirm?review_id="+review_id;
+            log.info("checklog: ReviewController_Controller-mapUrl:{}", mapUrl);
+
+
+
+            //클라이언트 측에 반환할 데이터들
+            SavedReviewDataDTO savedReviewDataDTO = new SavedReviewDataDTO();
+            savedReviewDataDTO.setContent(returnReviewDataDTO.getContent());
+            savedReviewDataDTO.setStartPlace(returnReviewDataDTO.getStartPlace());
+            savedReviewDataDTO.setEndPlace(returnReviewDataDTO.getEndPlace());
+            savedReviewDataDTO.setMapUrl(mapUrl);
+
+
+
+
+            return ResponseEntity.ok(savedReviewDataDTO);
 
 
 

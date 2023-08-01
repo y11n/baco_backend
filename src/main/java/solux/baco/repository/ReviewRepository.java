@@ -6,6 +6,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
@@ -32,7 +34,7 @@ public class ReviewRepository {
 
     /**후기 저장 메서드*/
     //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
-    public Optional<Review> save(Review review) {
+    public Long save(Review review) {
 
         log.info("checklog: review.getEndPlace: {}", review.getEndPlace());
 
@@ -48,7 +50,18 @@ public class ReviewRepository {
         String sql = "INSERT INTO review (member_id,content,start_place,end_place, date,route_point) VALUES (?, ?, ?, ? , ?, ?)";
         jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(), review.getRoute_point());
 
-        return Optional.ofNullable(review);
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("review").usingGeneratedKeyColumns("review_id");
+
+        Long review_id = simpleJdbcInsert.executeAndReturnKey(new MapSqlParameterSource()
+                .addValue("member_id", review.getMember().getMember_id())
+                .addValue("content",review.getContent())
+                .addValue("start_place",review.getStartPlace())
+                .addValue("end_place",review.getEndPlace())
+                .addValue("date",review.getDate())
+                .addValue("route_point",review.getRoute_point()))
+                .longValue();
+
+        return review_id;
     }
 
 

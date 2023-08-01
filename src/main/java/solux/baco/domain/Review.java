@@ -86,7 +86,7 @@ public class Review {
     }
 
 
-    @Column(length=10000)
+    @Column(columnDefinition = "TEXT")
     private String route_point; //저장 타입 변경될 수도 있음.
 
 
