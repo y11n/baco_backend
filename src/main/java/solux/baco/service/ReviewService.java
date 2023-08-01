@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
@@ -40,7 +41,7 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview( HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
+    public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) {
         log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", content);
@@ -51,12 +52,15 @@ public class ReviewService {
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
         String mapUrl;
 
+        String email = "test@test.com"; //테스트 용 더미데이터
+
+/**
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
         log.info("checklog: loginEmail : {}", email);
         //전달받은 데이터 예외처리
         log.info("checklog: ReviewService");
-
+*/
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
         log.info("checklog: writerInfo: {}", writerInfo);
@@ -92,41 +96,21 @@ public class ReviewService {
     }
 
 
-
-
-
-
-/**상세조회 관련 메서드*/
-
-
+    /**
+     * 상세조회 관련 메서드
+     */
 
 
     //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
-    public JsonDataEntity getJsonData(Long review_id) {
+    public String getJsonData(Long review_id) {
         log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
 
-        //review_id로 review레코드를 찾아서 route_id를 빼와야하고,
-        // route_id로 다시 routePoint를 빼와야함.
-        // routePoint는 JsonDataEntity구조와 매핑돼서 객체형태로 저장한 후 controller->html로 전달됨.
         try {
-            log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
             String routePointString = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
-            log.info("checklog: ReviewService_getJsonData-routePoint: {}", routePointString);
+            log.info("checklog: MapHtmlService_getJsonData-routePointString: {}", routePointString);
 
-            Map<String,Object> makeJson = new HashMap<>();
-            makeJson.put("route_point", routePointString);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            routePointString = objectMapper.writeValueAsString(makeJson);
-
-            //makeJson을 객체로 바꾸기.
-            JsonDataEntity routePointList = objectMapper.readValue(routePointString,JsonDataEntity.class);
-
-            log.info("checklog: ReviewService_getJsonData-routePointList: {}", routePointList);
-
-            return routePointList; //일단 controller로 다시 반환 (html 동적 렌더링을 하기 위해서)
-
-        } catch (IOException e) {
+            return routePointString;
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -135,7 +119,6 @@ public class ReviewService {
     //(데이터 빼올 때 )
     public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
-
         log.info("checklog: ReviewService_reviewDetail-review_id: {}", review_id);
 
         //review_id에 해당되는 저장값 가져오도록 repository 호출
@@ -143,8 +126,7 @@ public class ReviewService {
             Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
             log.info("checklog: ReviewService_reviewDetail-reviewEntity: {}", reviewEntity);
 
-            //startPlace,endPlace,content,date,member_id(nickname을 구하기 위해서 member_id도 포함)
-            // Optional이기 때문에 null일 수도 있음.
+                // Optional이기 때문에 null일 수도 있음.
             if (reviewEntity.isPresent()) {
                 Review review = reviewEntity.get();
                 //String startPlace = review.getStartPlace();
@@ -157,24 +139,30 @@ public class ReviewService {
                 log.info("checklog: ReviewService_reviewDetail-member_id: {}", member_id);
 
 
-/**
-                //Optional이기 때문에 null일 수도 있음.
-                Optional<Member> memberEntity = reviewRepository.detailMember(member_id);
-                if (memberEntity.isPresent()) {
-                    Member member = memberEntity.get();
-                    String nickname = member.getNickname();
-*/
-                    //return할 dto로 변환
+                //return할 dto로 변환
 
                 reviewDetailDTO.setContent(content);
                 reviewDetailDTO.setMapUrl(mapUrl);
-                }
+            }
 
         } catch (Exception e) {
 
             return null; //예외처리 구현예정
         }
         return reviewDetailDTO;
+    }
+
+    public Double[][] makeArray(String jsonData) {
+        JSONArray jsonArray = new JSONArray(jsonData);
+        Double[][] jsonDataArray = new Double[jsonArray.length()][2];
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONArray innerArray = jsonArray.getJSONArray(i);
+            jsonDataArray[i][0] = innerArray.getDouble(0);
+            jsonDataArray[i][1] = innerArray.getDouble(1);
+        }
+
+        return jsonDataArray;
     }
 }
 

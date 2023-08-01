@@ -81,8 +81,8 @@ public class ReviewController {
             WebClient webClient = WebClient.create();
 
             String apiUrl = "http://localhost:8080/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
-            double[] startParameter = {37.56640973022008, 126.97857314414601}; //ex-"127.12345, 37.12345"
-            double[] endParameter = {37.57621220811897, 126.97672509786915}; //ex-"128.12345,38.12345"
+            double[] startParameter = {37.549785,127.081546}; //ex-"127.12345, 37.12345"
+            double[] endParameter = {37.545020,127.040982}; //ex-"128.12345,38.12345"
 
             //요청 파라미터 설정 => url 쿼리 스트링 파라미터
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
@@ -97,16 +97,31 @@ public class ReviewController {
                     .block();
             log.info("checklog: routePoint:{}", routePointString);
 
+/**
+            //mapTest를 분리해서 api 새로?
+            //아니면 review_id를 다시 구해와서 html 렌더링?
+   */
+
 
             //html 동적 렌더링 코드 추가 예정. (일단 저장 구현부터..)
-
             String mapUrl = "테스트 중";
+            log.info("checklog: MapHtmlController_saveReviewController-mapUrl: {}", mapUrl);
+
+
+
+
 
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
 
             //ReviewService 호출
             returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString);
             return ResponseEntity.ok(returnReviewDataDTO);
+
+
+
+
+
+
 
 
         } catch (Exception e) {
@@ -121,42 +136,41 @@ public class ReviewController {
     //후기 게시글 상세 조회
     @GetMapping("/detail/{review_id}")
     public ReviewDetailDTO reviewDetailContriller(@PathVariable Long review_id, Model model) {
+        log.info("checklog: ReviewController_reviewDetailController");
         try {
+            String mapUrl;
             //예외처리 구현 예정
-            log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", review_id);
 
+            //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
+            WebClient webClient = WebClient.create();
 
-            JsonDataEntity jsonData = reviewService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
-            if (jsonData != null) {
-/**
-                //JsonData를 html에 렌더링하기 위해 Thymeleaf 템플릿으로 전달. (=Thymeleaf를 통해 html로 전달)
-                model.addAttribute("jsonData", jsonDataEntity.getRoutePoint()); //jsonDTO형태로 맞춰서 저장했다가 getter메서드로 가져와서 model로 전달하기.
-                log.info("checklog: ReviewController_reviewDetailContriller-model.addAttribute");
-                //html 렌더링 성공하면 =>
-                String serverUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/";
-                String mapUrl = serverUrl + "mapTest"; //변경예정
-                log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", mapUrl);
-*/
+            String apiUrl = "http://localhost:8080/mapTest"; //서버 배포 시 url 변경 예정
 
-                String mapUrl = "테스트 url";
-                log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", mapUrl);
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
+                    .queryParam("review_id", review_id);
 
-                //review_id로 상세조회 시 필요한 데이터들 객체형태로 가져오는 service 메서드 호출.
-                ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
-                //log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", review_id);
+            String mapTest = webClient.get()
+                    .uri(uriBuilder.toUriString())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
-                //reviewDetailDTO의 mapUrl 에 setMapUrl(mapUrl)해서 설정 후 객체 형태로 반환.
-                // (이후 프론트에서는 json에서 파싱해서 해당 url은 iframe으로 띄우고 다른 정보들도 각각 띄워줌.)
-                return reviewDetail; //
+            //html에 경로 표시하기 성공하면
+            mapUrl = "http://localhost:8080/mapTest?review_id="+review_id;
+            log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
+            ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
 
-            }
-        } catch (Exception e) {
+            return reviewDetail;
+
+        } catch (
+                Exception e) {
             //예외처리 구현 예정
             return null;
         }
 
-    return reviewDetailDTO; //수정해야할 듯.
+
     }
 
 

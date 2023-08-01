@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import solux.baco.service.MapHtmlService;
+import solux.baco.service.ReviewService;
 import solux.baco.service.ReviewModel.ReviewDetailDTO;
 import solux.baco.service.ReviewModel.returnReviewDataDTO;
 import solux.baco.service.RouteModel.JsonDataEntity;
@@ -18,11 +18,11 @@ import solux.baco.service.RouteModel.JsonDataEntity;
 @Controller
 public class MapTestController {
 
-    private final MapHtmlService mapHtmlService;
+    private final ReviewService reviewService;
 
     @Autowired
-    public MapTestController(MapHtmlService mapHtmlService) {
-        this.mapHtmlService = mapHtmlService;
+    public MapTestController(ReviewService reviewService) {
+        this.reviewService = reviewService;
 
     }
 
@@ -30,12 +30,12 @@ public class MapTestController {
     public String showMapPage(@RequestParam String review_id, Model model) {
         log.info("checklog: MapTestController-showMapPage-review_id:{}", review_id);
         Long review_idLong = Long.parseLong(review_id);
-        String jsonData = mapHtmlService.getJsonData(review_idLong);
+        String jsonData = reviewService.getJsonData(review_idLong);
         log.info("checklog: MapTestController-showMapPage-jsonData:{}", jsonData);
         if (jsonData != null) {
 
             //jsonData를 파싱해서 이중배열형태로 다시 만들기 위해 service 호출
-            Double[][] jsonDataArray = mapHtmlService.makeArray(jsonData);
+            Double[][] jsonDataArray = reviewService.makeArray(jsonData);
 
 
 
