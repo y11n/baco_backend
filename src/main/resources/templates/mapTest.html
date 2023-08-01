@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>간단한 지도 표시하기</title>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=73qkoqmj6s"></script>
+</head>
+<body>
+<div id="map" style="width: 605px; height: 380px;"></div>
+<div id="jsonData" th:attr="data-path=${jsonData}"></div>
+<!--th:attr 속성: div에 data-path속성을 동적으로 설정,
+data-path속성은 {$jsonData}값을 할당.
+({$jsonData}는 Thymleaf를 통해 서버에서 가져온 데이터)-->
+
+<!---->
+<script th:inline="javascript">
+        //Thymleaf로부터 json 데이터 가져오기( /*[[${jsonData}]]*/ => Thymleaf템플릿 엔진에서 데이터를 가져와 js 변수로 할당)
+        var jsonData = /*[[${jsonData}]]*/ {};
+
+        for (var i = 0; i< jsonData.path.length; i++) {
+            var lat = jsonData.path[i][0];
+            var lng = jsonData.path[i][1];
+        }
+
+
+
+        var mapOptions = {
+            center: new naver.maps.LatLng(  37.5754594, 126.9761248  ),
+            zoom: 13
+        };
+
+        var map = new naver.maps.Map('map', mapOptions);
+
+        var paths = jsonData.path; // json 데이터에서 path 배열 가져오기 =>db에 저장하는 형태 이렇게 바꾸기!!!
+
+        var polylinePath = [];
+        paths.map((path) => {
+            polylinePath.push(new naver.maps.LatLng(path[0], path[1])); // 위도와 경도 순서 바꾸기
+        });
+
+        const polyline = new naver.maps.Polyline({
+            path: polylinePath, // 좌표배열
+            strokeColor: "#FF0000", // 선의 색 빨강
+            strokeOpacity: 0.8, // 선의 투명도
+            strokeWeight: 4, // 선의 두께
+            map: map, // 만들어 놓은 지도
+        });
+    </script>
+</body>
+</html>
