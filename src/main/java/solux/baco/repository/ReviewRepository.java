@@ -36,15 +36,11 @@ public class ReviewRepository {
     //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
     public Long save(Review review) {
 
-        log.info("checklog: review.getEndPlace: {}", review.getEndPlace());
-
-        log.info("checklog: review.getStartPlace: {}", review.getStartPlace());
-
-        log.info("checklog: review.getContent: {}", review.getContent());
-
-        log.info("checklog: review.getMember: {}", review.getMember());
-
-        log.info("checklog: review.getRoutePoint: {}", review.getRoute_point());
+        log.info("checklog: ReviewRepository_save-review.getEndPlace: {}", review.getEndPlace());
+        log.info("checklog: ReviewRepository_save-review.getStartPlace: {}", review.getStartPlace());
+        log.info("checklog: ReviewRepository_save-review.getContent: {}", review.getContent());
+        log.info("checklog: ReviewRepository_save-review.getMember: {}", review.getMember());
+        log.info("checklog: ReviewRepository_save-review.getRoutePoint: {}", review.getRoute_point());
 
 
         String sql = "INSERT INTO review (member_id,content,start_place,end_place, date,route_point) VALUES (?, ?, ?, ? , ?, ?)";

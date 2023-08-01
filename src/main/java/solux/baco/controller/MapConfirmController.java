@@ -25,10 +25,10 @@ public class MapConfirmController {
 
     @GetMapping("/mapConfirm")
     public String showMapPage(@RequestParam String review_id, Model model) {
-        log.info("checklog: MapTestController-showMapPage-review_id:{}", review_id);
+        log.info("checklog: MapConfirmController-showMapPage-review_id:{}", review_id);
         Long review_idLong = Long.parseLong(review_id);
         String jsonData = reviewService.getJsonData(review_idLong);
-        log.info("checklog: MapTestController-showMapPage-jsonData:{}", jsonData);
+        log.info("checklog: MapConfirmController-showMapPage-jsonData:{}", jsonData);
         if (jsonData != null) {
 
             //jsonData를 파싱해서 이중배열형태로 다시 만들기 위해 service 호출

@@ -50,16 +50,6 @@ public class ReviewController {
     }
 
 
-    //@GetMapping("/test")
-    public void dateTest() {
-        /**
-         //LocalDateTime 이용한 방법.
-         LocalDateTime date = LocalDateTime.now();
-         log.info("checklog: date = {}",date);
-         */
-    }
-
-
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody
@@ -74,13 +64,13 @@ public class ReviewController {
             String startPlace = reviewData.getStartPlace();
             String endPlace = reviewData.getEndPlace();
             String content = reviewData.getContent();
-            log.info("checklog: startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
+            log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
 
 
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
             WebClient webClient = WebClient.create();
 
-            String apiUrl = "http://localhost:8080/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
+            String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
             double[] startParameter = {37.568403,126.896931}; //ex-"127.12345, 37.12345"
             double[] endParameter = {37.549180,126.989704}; //ex-"128.12345,38.12345"
 
@@ -95,7 +85,7 @@ public class ReviewController {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            log.info("checklog: routePoint:{}", routePointString);
+            log.info("checklog: ReviewController_saveReviewController-routePoint:{}", routePointString);
 
 
 
@@ -114,7 +104,7 @@ public class ReviewController {
             //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
             WebClient webClient_map = WebClient.create();
 
-            String apiUrl_map = "http://localhost:8080/mapConfirm"; //서버 배포 시 url 변경 예정
+            String apiUrl_map = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/mapConfirm"; //서버 배포 시 url 변경 예정
 
             UriComponentsBuilder uriBuilder_map = UriComponentsBuilder.fromUriString(apiUrl_map)
                     .queryParam("review_id", review_id);
@@ -128,8 +118,8 @@ public class ReviewController {
 
             //html 경로 표시 성공하면
             //html에 경로 표시하기 성공하면
-            mapUrl = "http://localhost:8080/mapConfirm?review_id="+review_id;
-            log.info("checklog: ReviewController_Controller-mapUrl:{}", mapUrl);
+            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/mapConfirm?review_id="+review_id;
+            log.info("checklog: ReviewController_saveReviewController-mapUrl:{}", mapUrl);
 
 
 
@@ -172,7 +162,7 @@ public class ReviewController {
             //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
             WebClient webClient = WebClient.create();
 
-            String apiUrl = "http://localhost:8080/map"; //서버 배포 시 url 변경 예정
+            String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
 
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
                     .queryParam("review_id", review_id);
@@ -185,7 +175,7 @@ public class ReviewController {
             log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
             //html에 경로 표시하기 성공하면
-            mapUrl = "http://localhost:8080/map?review_id="+review_id;
+            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id="+review_id;
             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
             ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);

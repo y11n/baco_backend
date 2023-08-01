@@ -44,10 +44,10 @@ public class ReviewService {
     //데이터 저장할 때
     @Transactional
     public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) { //
-        log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
-        log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
-        log.info("checklog: review.setRoutePoint(routePoint): {}", content);
-        log.info("checklog: review.setRoutePoint(routePoint): {}", routePoint);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", startPlace);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", endPlace);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", content);
+        log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", routePoint);
 
 
         Review review = new Review();
@@ -55,20 +55,20 @@ public class ReviewService {
 
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
-        log.info("checklog: loginEmail : {}", email);
+        log.info("checklog: ReviewService_saveReview-loginEmail : {}", email);
         //전달받은 데이터 예외처리
-        log.info("checklog: ReviewService");
+        log.info("checklog: ReviewService_saveReview-ReviewService");
 
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
-        log.info("checklog: writerInfo: {}", writerInfo);
+        log.info("checklog: ReviewService_saveReview-writerInfo: {}", writerInfo);
 
         //3. 받아온 Member객체를 통해서 member_id 추출하기
         if (writerInfo.isPresent()) {
             //Optional 객체 속의 요소인 Member객체를 가져오기 위해 .get() //(null이 아닐 때만 get으로 가져올 수 있음.)
             Member member = writerInfo.get();
             //Long member_id = member.getMember_id();
-            log.info("checklog: review.routePoint: {}", routePoint);
+            log.info("checklog: ReviewService_saveReview-review.routePoint: {}", routePoint);
 
 
             review.setMember(member); //작성자의 member테이블 레코드 저장
@@ -78,7 +78,7 @@ public class ReviewService {
             review.setDate(LocalDate.now());
             review.setRoute_point(routePoint); //(7/30)수정-route테이블은 삭제, 후기테이블에 routePoint 컬럼 추가.
 
-            log.info("checklog: review.setRoutePoint(routePoint): {}", review.getRoute_point());
+            log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", review.getRoute_point());
 
             Long review_id = reviewRepository.save(review);
 
