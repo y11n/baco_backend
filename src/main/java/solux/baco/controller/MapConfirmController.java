@@ -1,6 +1,5 @@
 package solux.baco.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,23 +9,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import solux.baco.service.ReviewService;
-import solux.baco.service.ReviewModel.ReviewDetailDTO;
-import solux.baco.service.ReviewModel.returnReviewDataDTO;
-import solux.baco.service.RouteModel.JsonDataEntity;
 
 @Slf4j
 @Controller
-public class MapTestController {
+
+public class MapConfirmController {
 
     private final ReviewService reviewService;
 
     @Autowired
-    public MapTestController(ReviewService reviewService) {
+    public MapConfirmController(ReviewService reviewService) {
         this.reviewService = reviewService;
 
     }
 
-    @GetMapping("/map")
+    @GetMapping("/mapConfirm")
     public String showMapPage(@RequestParam String review_id, Model model) {
         log.info("checklog: MapTestController-showMapPage-review_id:{}", review_id);
         Long review_idLong = Long.parseLong(review_id);
@@ -47,5 +44,5 @@ public class MapTestController {
 
             // HTML 파일 이름 (확장자 제외)을 리턴
         }
-        return "map"; }
+        return "mapConfirm"; }
 }

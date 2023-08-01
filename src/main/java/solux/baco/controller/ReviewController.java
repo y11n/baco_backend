@@ -62,9 +62,9 @@ public class ReviewController {
 
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
-    @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<SavedReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
-        //HttpSession session,
+    @ResponseBody
+    public ResponseEntity<SavedReviewDataDTO> saveReviewController(HttpSession session,@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+        //
         try {
             String mapUrl;
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
@@ -102,7 +102,7 @@ public class ReviewController {
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
             //ReviewService 호출
             //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(startPlace, endPlace, content, routePointString); //session,
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString); //
 
             //review_id 구하기
             //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!
@@ -185,7 +185,7 @@ public class ReviewController {
             log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
             //html에 경로 표시하기 성공하면
-            mapUrl = "http://localhost:8080/mapTest?review_id="+review_id;
+            mapUrl = "http://localhost:8080/map?review_id="+review_id;
             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
             ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);

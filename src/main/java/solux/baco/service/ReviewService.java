@@ -43,7 +43,7 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview( String startPlace, String endPlace, String content, String routePoint) { //HttpSession session,
+    public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) { //
         log.info("checklog: review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: review.setRoutePoint(routePoint): {}", content);
@@ -53,26 +53,12 @@ public class ReviewService {
         Review review = new Review();
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
 
-
-
-
-
-
-
-
-
-
-
-
-        String email = "test@test.com"; //테스트 용 더미데이터
-
-/**
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
         log.info("checklog: loginEmail : {}", email);
         //전달받은 데이터 예외처리
         log.info("checklog: ReviewService");
-*/
+
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
         log.info("checklog: writerInfo: {}", writerInfo);
