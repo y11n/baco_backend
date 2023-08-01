@@ -144,7 +144,7 @@ public class ReviewController {
             //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
             WebClient webClient = WebClient.create();
 
-            String apiUrl = "http://localhost:8080/mapTest"; //서버 배포 시 url 변경 예정
+            String apiUrl = "http://localhost:8080/map"; //서버 배포 시 url 변경 예정
 
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
                     .queryParam("review_id", review_id);
@@ -161,11 +161,15 @@ public class ReviewController {
             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
             ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
+            log.info("checklog: ReviewController_reviewDetailController-content:{},mapUrl:{}", reviewDetail.getContent(),mapUrl);
 
             return reviewDetail;
 
         } catch (
                 Exception e) {
+            log.info("checklog: ReviewController_reviewDetailController-catch");
+
+            //html 경로 표시 실패하면
             //예외처리 구현 예정
             return null;
         }

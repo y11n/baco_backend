@@ -103,11 +103,11 @@ public class ReviewService {
 
     //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
     public String getJsonData(Long review_id) {
-        log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
+        log.info("checklog: ReviewService_getJsonData");
 
         try {
             String routePointString = reviewRepository.routeData(review_id); //review_id로 route데이터 빼오는 과정
-            log.info("checklog: MapHtmlService_getJsonData-routePointString: {}", routePointString);
+            log.info("checklog: ReviewService_getJsonData-routePointString: {}", routePointString);
 
             return routePointString;
         } catch (Exception e) {
@@ -119,12 +119,12 @@ public class ReviewService {
     //(데이터 빼올 때 )
     public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
-        log.info("checklog: ReviewService_reviewDetail-review_id: {}", review_id);
+        log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
 
         //review_id에 해당되는 저장값 가져오도록 repository 호출
         try {
             Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
-            log.info("checklog: ReviewService_reviewDetail-reviewEntity: {}", reviewEntity);
+            log.info("checklog: ReviewService_getJsonData-reviewEntity: {}", reviewEntity);
 
                 // Optional이기 때문에 null일 수도 있음.
             if (reviewEntity.isPresent()) {
@@ -132,17 +132,21 @@ public class ReviewService {
                 //String startPlace = review.getStartPlace();
                 //String endPlace = review.getEndPlace();
                 String content = review.getContent();
-                Long member_id = review.getMember().getMember_id();
-                //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
-                //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
-                log.info("checklog: ReviewService_reviewDetail-content: {}", content);
-                log.info("checklog: ReviewService_reviewDetail-member_id: {}", member_id);
+                //Long member_id = review.getMember().getMember_id();
 
 
-                //return할 dto로 변환
 
                 reviewDetailDTO.setContent(content);
                 reviewDetailDTO.setMapUrl(mapUrl);
+                //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
+                //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
+                log.info("checklog: ReviewService_getJsonData-content: {}", content);
+                log.info("checklog: ReviewService_getJsonData-mapUrl: {}", mapUrl);
+
+
+
+
+
             }
 
         } catch (Exception e) {
@@ -153,6 +157,8 @@ public class ReviewService {
     }
 
     public Double[][] makeArray(String jsonData) {
+        log.info("checklog: ReviewService_makeArray");
+
         JSONArray jsonArray = new JSONArray(jsonData);
         Double[][] jsonDataArray = new Double[jsonArray.length()][2];
 
@@ -161,7 +167,7 @@ public class ReviewService {
             jsonDataArray[i][0] = innerArray.getDouble(0);
             jsonDataArray[i][1] = innerArray.getDouble(1);
         }
-
+        log.info("checklog: ReviewService_makeArray-jsonDataArray:{}",jsonDataArray);
         return jsonDataArray;
     }
 }
