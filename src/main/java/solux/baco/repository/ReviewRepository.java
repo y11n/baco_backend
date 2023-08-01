@@ -1,6 +1,6 @@
 package solux.baco.repository;
 
-
+import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -29,8 +29,9 @@ public class ReviewRepository {
     }
 
 
-
-    /**후기 저장 메서드*/
+    /**
+     * 후기 저장 메서드
+     */
     //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
     public Optional<Review> save(Review review) {
 
@@ -52,12 +53,11 @@ public class ReviewRepository {
     }
 
 
-
-
-
-    /**r후기 상세 조회 관련 메서드*/
+    /**
+     * r후기 상세 조회 관련 메서드
+     */
     public String routeData(Long review_id) {
-        Review review = entityManager.find(Review.class,review_id);
+        Review review = entityManager.find(Review.class, review_id);
         String routeData = review.getRoute_point();
         return routeData;
     }
@@ -74,6 +74,22 @@ public class ReviewRepository {
     public Optional<Member> detailMember(Long member_id) {
         Member member = entityManager.find(Member.class, member_id);
         return Optional.ofNullable(member);
+    }
+
+    public Review findOne(Long reviewId) {
+        return entityManager.find(Review.class, reviewId);
+    }
+
+    public List<Review> findMemberReviews(Long memberId) {
+        return entityManager.createQuery("select m from Review m where m.member.member_id = :memberId", Review.class)
+                .setParameter("memberId", memberId)
+                .getResultList();
+    }
+
+    public List<Review> findHashtagReviews(String hashtag) {
+        return entityManager.createQuery("select m from Review m where m.hashtag = :hashtag", Review.class)
+                .setParameter("hashtag", hashtag)
+                .getResultList();
     }
 
 }
