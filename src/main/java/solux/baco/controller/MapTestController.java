@@ -26,7 +26,7 @@ public class MapTestController {
 
     }
 
-    @GetMapping("/mapTest")
+    @GetMapping("/map")
     public String showMapPage(@RequestParam String review_id, Model model) {
         log.info("checklog: MapTestController-showMapPage-review_id:{}", review_id);
         Long review_idLong = Long.parseLong(review_id);
@@ -47,5 +47,5 @@ public class MapTestController {
 
             // HTML 파일 이름 (확장자 제외)을 리턴
         }
-        return "mapTest"; }
+        return "map"; }
 }
