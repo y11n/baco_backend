@@ -14,6 +14,7 @@ import solux.baco.domain.Review;
 import solux.baco.domain.Route;
 import solux.baco.service.RouteModel.JsonDataEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -85,4 +86,23 @@ public class ReviewRepository {
         return Optional.ofNullable(member);
     }
 
+
+
+    public Review findOne(Long reviewId) {
+        return entityManager.find(Review.class, reviewId);
+    }
+
+    public List<Review> findMemberReviews(Long memberId) {
+        return entityManager.createQuery("select m from Review m where m.member.member_id = :memberId", Review.class)
+                .setParameter("memberId", memberId)
+                .getResultList();
+    }
+
+    public List<Review> findHashtagReviews(String hashtag) {
+        return entityManager.createQuery("select m from Review m where m.hashtag = :hashtag", Review.class)
+                .setParameter("hashtag", hashtag)
+                .getResultList();
+    }
+
 }
+
