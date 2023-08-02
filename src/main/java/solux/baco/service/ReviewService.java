@@ -47,7 +47,7 @@ public class ReviewService {
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview( String startPlace, String endPlace, String content, String routePoint) { //HttpSession session,
+    public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) { //
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", content);
@@ -56,15 +56,13 @@ public class ReviewService {
 
         Review review = new Review();
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
-/**
+
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
         log.info("checklog: ReviewService_saveReview-loginEmail : {}", email);
         //전달받은 데이터 예외처리
         log.info("checklog: ReviewService_saveReview-ReviewService");
-*/
 
-        String email = "123@gmail.com";
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
         log.info("checklog: ReviewService_saveReview-writerInfo: {}", writerInfo);
@@ -94,14 +92,14 @@ public class ReviewService {
             returnReviewDataDTO.setReview_id(review_id);
 
         } else {
-          return null;
+            return null;
         }
         return returnReviewDataDTO;
     }
 
 
 
-/**상세조회 관련 메서드*/
+    /**상세조회 관련 메서드*/
 
 
 
@@ -131,7 +129,7 @@ public class ReviewService {
             Optional<Review> reviewEntity = reviewRepository.detailReview(review_id);
             log.info("checklog: ReviewService_getJsonData-reviewEntity: {}", reviewEntity);
 
-                // Optional이기 때문에 null일 수도 있음.
+            // Optional이기 때문에 null일 수도 있음.
             if (reviewEntity.isPresent()) {
                 Review review = reviewEntity.get();
                 //String startPlace = review.getStartPlace();
@@ -160,8 +158,8 @@ public class ReviewService {
         }
         return reviewDetailDTO;
     }
-  
-    
+
+
     public Review findReview(Long reviewId){
         return reviewRepository.findOne(reviewId);
     }
@@ -190,4 +188,3 @@ public class ReviewService {
         return jsonDataArray;
     }
 }
-

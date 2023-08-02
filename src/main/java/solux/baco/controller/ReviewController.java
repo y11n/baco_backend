@@ -44,8 +44,6 @@ public class ReviewController {
 
     @Autowired
     public ReviewController(ReviewService reviewService, returnReviewDataDTO returnReviewDataDTO, ReviewDetailDTO reviewDetailDTO, JsonDataEntity jsonDataEntity) {
-
-
         this.reviewService = reviewService;
         this.returnReviewDataDTO = returnReviewDataDTO;
         this.reviewDetailDTO = reviewDetailDTO;
@@ -57,30 +55,27 @@ public class ReviewController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody
-    public ResponseEntity<SavedReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.   //HttpSession session,
+    public ResponseEntity<SavedReviewDataDTO> saveReviewController(HttpSession session,@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+        //
 
-        try {
+         String email = (String) session.getAttribute("loginEmail");
+         log.info("session->email : {}",email);
+         log.info("requestBody data-content : {}",reviewData.getContent());
+         log.info("requestBody data-startPlace : {}",reviewData.getStartPlace());
+         log.info("requestBody data-endPlace : {}",reviewData.getEndPlace());
+
+         try {
             String mapUrl;
-            /**
-            String email = (String) session.getAttribute("loginEmail");
-            log.info("session->email : {}",email);
-            log.info("requestBody data-content : {}",reviewData.getContent());
-            log.info("requestBody data-startPlace : {}",reviewData.getStartPlace());
-            log.info("requestBody data-endPlace : {}",reviewData.getEndPlace());
-
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
-*/
-            //1. ReviewDTO형태의 reviewData를 통해 startPlace,endPlace,content 추출.
-            ReviewDTO reviewDTO = new ReviewDTO();
-            reviewDTO.setStartPlace(reviewData.getStartPlace());
-            reviewDTO.setEndPlace(reviewData.getEndPlace());
-            reviewDTO.setContent(reviewData.getContent());
-            //String endPlace = reviewData.getEndPlace();
-            //String content = reviewData.getContent();
-            //log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
 
-/**
+            //1. ReviewDTO형태의 reviewData를 통해 startPlace,endPlace,content 추출.
+            String startPlace = reviewData.getStartPlace();
+            String endPlace = reviewData.getEndPlace();
+            String content = reviewData.getContent();
+            log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
+
+
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
             WebClient webClient = WebClient.create();
 
@@ -100,15 +95,13 @@ public class ReviewController {
                     .bodyToMono(String.class)
                     .block();
             log.info("checklog: ReviewController_saveReviewController-routePoint:{}", routePointString);
-*/
 
-            String routePointString = "원격 서버 후기 작성 테스트 중_경로 생략";
 
 
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
             //ReviewService 호출
             //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(reviewDTO.getStartPlace(), reviewData.getEndPlace(), reviewData.getContent(), routePointString); //session,
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString); //
 
             //review_id 구하기
             //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!
@@ -118,24 +111,23 @@ public class ReviewController {
 
 
             //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
-            WebClient webClient_map = WebClient.create();
+              WebClient webClient_map = WebClient.create();
 
-            String apiUrl_map = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/mapConfirm"; //서버 배포 시 url 변경 예정
+             String apiUrl_map = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
 
-            UriComponentsBuilder uriBuilder_map = UriComponentsBuilder.fromUriString(apiUrl_map)
-                    .queryParam("review_id", review_id);
+             UriComponentsBuilder uriBuilder_map = UriComponentsBuilder.fromUriString(apiUrl_map)
+                     .queryParam("review_id", review_id);
 
-            String mapTest = webClient_map.get()
-                    .uri(uriBuilder_map.toUriString())
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+             String mapTest = webClient.get()
+                     .uri(uriBuilder.toUriString())
+                     .retrieve()
+                     .bodyToMono(String.class)
+                     .block();
+             log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
-
-            //html 경로 표시 성공하면
-            //html에 경로 표시하기 성공하면
-            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/mapConfirm?review_id="+review_id;
-            log.info("checklog: ReviewController_saveReviewController-mapUrl:{}", mapUrl);
+             //html에 경로 표시하기 성공하면
+             mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id="+review_id;
+             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
 
 
@@ -177,6 +169,7 @@ public class ReviewController {
 
             //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
             WebClient webClient = WebClient.create();
+            WebClient webClient_map = WebClient.create();
 
             String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
 
@@ -193,6 +186,10 @@ public class ReviewController {
             //html에 경로 표시하기 성공하면
             mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id="+review_id;
             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
+
+
+
+
 
             ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
             log.info("checklog: ReviewController_reviewDetailController-content:{},mapUrl:{}", reviewDetail.getContent(),mapUrl);
