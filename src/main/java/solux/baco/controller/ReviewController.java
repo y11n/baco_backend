@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import solux.baco.service.ReviewModel.ReviewDTO;
 import solux.baco.service.ReviewService;
 import solux.baco.service.RouteModel.JsonDataEntity;
+import solux.baco.service.RouteModel.RouteDTO;
 import solux.baco.service.RouteService;
 import org.springframework.ui.Model;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +43,15 @@ public class ReviewController {
     private final returnReviewDataDTO returnReviewDataDTO;
     private final ReviewDetailDTO reviewDetailDTO;
     private final JsonDataEntity jsonDataEntity;
+    private final ReviewDTO reviewDTO;
 
     @Autowired
-    public ReviewController(ReviewService reviewService, returnReviewDataDTO returnReviewDataDTO, ReviewDetailDTO reviewDetailDTO, JsonDataEntity jsonDataEntity) {
+    public ReviewController(ReviewService reviewService, returnReviewDataDTO returnReviewDataDTO, ReviewDetailDTO reviewDetailDTO, JsonDataEntity jsonDataEntity,ReviewDTO reviewDTO) {
         this.reviewService = reviewService;
         this.returnReviewDataDTO = returnReviewDataDTO;
         this.reviewDetailDTO = reviewDetailDTO;
         this.jsonDataEntity = jsonDataEntity;
+        this.reviewDTO = reviewDTO;
 
     }
 
@@ -55,19 +59,27 @@ public class ReviewController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody
-    public ResponseEntity<SavedReviewDataDTO> saveReviewController(HttpSession session,@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<SavedReviewDataDTO> saveReviewController(HttpSession session, @RequestBody String reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
 
         try {
-            log.info("requestBody data : {}",reviewData);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // readValue()메서드를 통해 json형식으로 구성된 string(response)을 java객체(RouteDTO 클래스)에 매핑 후 RouteDTO변수 RouteDTO에 저장.
+            ReviewDTO getRequestBodyData = objectMapper.readValue(reviewData, ReviewDTO.class);
+            String startPlace = getRequestBodyData.getStartPlace();
+            String endPlace = getRequestBodyData.getEndPlace();
+            String content = getRequestBodyData.getContent();
+
+            String email = (String) session.getAttribute("loginEmail");
+            log.info("session->email : {}", email);
+            log.info("requestBody data : {}", reviewData);
             String mapUrl;
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
 
             //1. ReviewDTO형태의 reviewData를 통해 startPlace,endPlace,content 추출.
-            ReviewDTO reviewDTO = new ReviewDTO();
-            reviewDTO.setStartPlace(reviewData.getStartPlace());
-            reviewDTO.setEndPlace(reviewData.getEndPlace());
-            reviewDTO.setContent(reviewData.getContent());
+
             //String endPlace = reviewData.getEndPlace();
             //String content = reviewData.getContent();
             //log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
@@ -94,17 +106,15 @@ public class ReviewController {
             log.info("checklog: ReviewController_saveReviewController-routePoint:{}", routePointString);
 
 
-
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
             //ReviewService 호출
             //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,reviewDTO.getStartPlace(), reviewData.getEndPlace(), reviewData.getContent(), routePointString); //
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session, startPlace, endPlace, content, routePointString); //
 
             //review_id 구하기
             //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!
             //String savedRoutePoint = reviewService.getRoutePointString(review_id);
             Long review_id = returnReviewDataDTO.getReview_id();
-
 
 
             //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
@@ -124,9 +134,8 @@ public class ReviewController {
 
             //html 경로 표시 성공하면
             //html에 경로 표시하기 성공하면
-            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/mapConfirm?review_id="+review_id;
+            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/mapConfirm?review_id=" + review_id;
             log.info("checklog: ReviewController_saveReviewController-mapUrl:{}", mapUrl);
-
 
 
             //클라이언트 측에 반환할 데이터들
@@ -137,15 +146,7 @@ public class ReviewController {
             savedReviewDataDTO.setMapUrl(mapUrl);
 
 
-
-
             return ResponseEntity.ok(savedReviewDataDTO);
-
-
-
-
-
-
 
 
         } catch (Exception e) {
@@ -181,11 +182,11 @@ public class ReviewController {
             log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
             //html에 경로 표시하기 성공하면
-            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id="+review_id;
+            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id=" + review_id;
             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
             ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
-            log.info("checklog: ReviewController_reviewDetailController-content:{},mapUrl:{}", reviewDetail.getContent(),mapUrl);
+            log.info("checklog: ReviewController_reviewDetailController-content:{},mapUrl:{}", reviewDetail.getContent(), mapUrl);
 
             return reviewDetail;
 
@@ -203,7 +204,7 @@ public class ReviewController {
 
     //해시태그 필터링
     @GetMapping("/reviews")
-    public List<Review> showReviews_hashtag(@RequestParam String hashtag){
+    public List<Review> showReviews_hashtag(@RequestParam String hashtag) {
         return reviewService.findHashtagReviews(hashtag);
     }
 
