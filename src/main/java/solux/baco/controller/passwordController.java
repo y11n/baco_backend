@@ -24,13 +24,13 @@ public class passwordController {
     private final MemberService memberService;
     private String myEmail;
 
-    @PostMapping("/change-password")
-    public Optional<Member> changePassword(@RequestBody PasswordForm form, HttpSession session){
-        myEmail = (String) session.getAttribute("loginEmail");
-        Optional<Member> presentMember = memberService.findByEmail(myEmail);
-        memberService.memberInfoUpdate(form, presentMember);
-        return presentMember;
-    }
+//    @PostMapping("/change-password")
+//    public Optional<Member> changePassword(@RequestBody PasswordForm form, HttpSession session){
+//        myEmail = (String) session.getAttribute("loginEmail");
+//        Optional<Member> presentMember = memberService.findByEmail(myEmail);
+//        memberService.memberInfoUpdate(form, presentMember);
+//        return presentMember;
+//    }
 
     /**
      *

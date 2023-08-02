@@ -15,6 +15,7 @@ import solux.baco.service.MemberService;
 import solux.baco.service.ReviewService;
 
 import javax.swing.text.html.Option;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,25 +32,39 @@ public class MypageController {
     private final LoginService loginService;
     private Optional<Member> presentMember;
 
-    @PostMapping("/MemberInfo-change")
-    public Optional<Member> updateMemberInfo(@RequestBody PasswordForm form, HttpSession session){
+
+    //memberId 사용하지 않고 회원정보 수정
+    /**
+     * @PostMapping("/MemberInfo-change")
+    public Optional<Member> updateMemberInfo1(@RequestBody PasswordForm form, HttpSession session){
         String myEmail = (String) session.getAttribute("loginEmail");
         Optional<Member> presentMember = memberService.findByEmail(myEmail);
         memberService.memberInfoUpdate(form, presentMember);
         return memberService.findByEmail(myEmail);
     }
+    */
+
+    //memberId 사용하여 회원정보 수정
+    @PostMapping("/MemberInfo-change/{member_id}")
+    public Member updateMemberInfo2(@PathVariable("member_id")Long member_id, @RequestBody PasswordForm form){
+        Member member1 = memberService.findOne(member_id);
+        memberService.memberInfoUpdate(form, member1);
+        return memberService.findOne(member_id);
+    }
 
     //memberId 사용하지 않고 나의 작성목록 조회
     @GetMapping("/My-reviews")
     public List<Review> showReviews1(HttpSession session){
-        log.info("run showReviews1");
         String myEmail = (String) session.getAttribute("loginEmail");
-        log.info("session.getAttribute(\"loginEmail\")");
         presentMember = memberService.findByEmail(myEmail);
-        log.info("memberService.findByEmail(myEmail)");
-        Long memberId = presentMember.get().getMember_id();
-        log.info("presentMember.get().getMember_id()");
-        return reviewService.findReviews(memberId);
+        if(presentMember.isPresent()){
+            Long memberId = presentMember.get().getMember_id();
+            return reviewService.findReviews(memberId);
+        }
+        else{
+            return Collections.emptyList();
+        }
+
     }
 
     //memeberId 사용하여 나의 작성목록 조회
