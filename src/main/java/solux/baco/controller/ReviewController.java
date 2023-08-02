@@ -111,7 +111,7 @@ public class ReviewController {
                     //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
                     WebClient webClient = WebClient.create();
 
-                    String apiUrl = "http://localhost:8080/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
+                    String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
                     double[] startParameter = {startLat, startLng}; //ex-"127.12345, 37.12345"
                     double[] endParameter = {endLat, endLng}; //ex-"128.12345,38.12345"
 
@@ -143,7 +143,7 @@ public class ReviewController {
                     //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
                     WebClient webClient_map = WebClient.create();
 
-                    String apiUrl_map = "http://localhost:8080/map"; //서버 배포 시 url 변경 예정
+                    String apiUrl_map = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
 
                     UriComponentsBuilder uriBuilder_map = UriComponentsBuilder.fromUriString(apiUrl_map)
                             .queryParam("review_id", review_id);
@@ -156,7 +156,7 @@ public class ReviewController {
                     log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
                     //html에 경로 표시하기 성공하면
-                    mapUrl = "http://localhost:8080/map?review_id=" + review_id;
+                    mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id=" + review_id;
                     log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
 
@@ -196,7 +196,7 @@ public class ReviewController {
             WebClient webClient = WebClient.create();
             WebClient webClient_map = WebClient.create();
 
-            String apiUrl = "http://localhost:8080/map"; //서버 배포 시 url 변경 예정
+            String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
 
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
                     .queryParam("review_id", review_id);
@@ -209,7 +209,7 @@ public class ReviewController {
             log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
 
             //html에 경로 표시하기 성공하면
-            mapUrl = "http://localhost:8080/map?review_id=" + review_id;
+            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id=" + review_id;
             log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
 
