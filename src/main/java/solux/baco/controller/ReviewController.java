@@ -56,17 +56,21 @@ public class ReviewController {
     @PostMapping("/save")
     @ResponseBody
     public ResponseEntity<SavedReviewDataDTO> saveReviewController(HttpSession session,@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
-        //
+
         try {
+            log.info("requestBody data : {}",reviewData);
             String mapUrl;
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
 
             //1. ReviewDTO형태의 reviewData를 통해 startPlace,endPlace,content 추출.
-            String startPlace = reviewData.getStartPlace();
-            String endPlace = reviewData.getEndPlace();
-            String content = reviewData.getContent();
-            log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
+            ReviewDTO reviewDTO = new ReviewDTO();
+            reviewDTO.setStartPlace(reviewData.getStartPlace());
+            reviewDTO.setEndPlace(reviewData.getEndPlace());
+            reviewDTO.setContent(reviewData.getContent());
+            //String endPlace = reviewData.getEndPlace();
+            //String content = reviewData.getContent();
+            //log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
 
 
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
@@ -94,7 +98,7 @@ public class ReviewController {
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
             //ReviewService 호출
             //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString); //
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,reviewDTO.getStartPlace(), reviewData.getEndPlace(), reviewData.getContent(), routePointString); //
 
             //review_id 구하기
             //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!

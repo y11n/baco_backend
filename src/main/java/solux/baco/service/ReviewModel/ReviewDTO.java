@@ -13,6 +13,8 @@ public class ReviewDTO {
 
     private String endPlace;
 
+    private String content;
+
     public void setStartPlace(String startPlace) {
         this.startPlace = startPlace;
     }
@@ -25,7 +27,7 @@ public class ReviewDTO {
         this.content = content;
     }
 
-    private String content;
+
 
     public String getStartPlace() {
         return startPlace;
