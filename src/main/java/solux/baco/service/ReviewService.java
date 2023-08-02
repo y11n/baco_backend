@@ -35,6 +35,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberService memberService;
     private final ReviewDetailDTO reviewDetailDTO;
+    private final Map<String, double[]> placeCoordinate = new HashMap<>(); //장소 좌표 매칭하기 위해 미리 저장
 
 
     public ReviewService(ReviewRepository reviewRepository, MemberService memberService, ReviewDetailDTO reviewDetailDTO) {
@@ -42,12 +43,63 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
         this.memberService = memberService;
         this.reviewDetailDTO = reviewDetailDTO;
+
+        //장소 매칭 좌표
+        placeCoordinate.put("숙명여대",new double[]{37.54167,126.964930});
+        placeCoordinate.put("숙명 여대",new double[]{37.54167,126.964930});
+        placeCoordinate.put("숙대",new double[]{37.54167,126.964930});
+        placeCoordinate.put("숙명여자대학교",new double[]{37.54167,126.964930});
+        placeCoordinate.put("숙명 여자대학교",new double[]{37.54167,126.964930});
+        placeCoordinate.put("숙명여자 대학교",new double[]{37.54167,126.964930});
+
+        placeCoordinate.put("남산타워",new double[]{37.549180,126.989704});
+        placeCoordinate.put("남산 타워",new double[]{37.549180,126.989704});
+        placeCoordinate.put("N서울타워",new double[]{37.549180,126.989704});
+        placeCoordinate.put("N 서울 타워",new double[]{37.549180,126.989704});
+        placeCoordinate.put("N서울 타워",new double[]{37.549180,126.989704});
+
+        placeCoordinate.put("청계천",new double[]{37.569225,126.978628});
+
+        placeCoordinate.put("경복궁",new double[]{37.57621220811897, 126.97672509786915});
+
+        placeCoordinate.put("어린이대공원",new double[]{37.549785,127.081546});
+        placeCoordinate.put("어린이 대공원",new double[]{37.549785,127.081546});
+        placeCoordinate.put("서울어린이대공원",new double[]{37.549785,127.081546});
+
+        placeCoordinate.put("홍대",new double[]{37.550768,126.925639});
+        placeCoordinate.put("홍익대학교",new double[]{37.550768,126.925639});
+        placeCoordinate.put("홍익 대학교",new double[]{37.550768,126.925639});
+
+        placeCoordinate.put("서울시청",new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울 시청",new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울 특별 시청",new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울특별시청",new double[]{37.56640973022008, 126.97857314414601});
+
+        placeCoordinate.put("여의도 한강공원",new double[]{37.528409,126.933089});
+        placeCoordinate.put("여의도한강 공원",new double[]{37.528409,126.933089});
+        placeCoordinate.put("여의도 한강 공원",new double[]{37.528409,126.933089});
+        placeCoordinate.put("한강공원",new double[]{37.528409,126.933089});
+        placeCoordinate.put("한강 공원",new double[]{37.528409,126.933089});
+        placeCoordinate.put("한강",new double[]{37.528409,126.933089});
+
+        placeCoordinate.put("서울숲",new double[]{37.545020,127.040982});
+        placeCoordinate.put("서울 숲",new double[]{37.545020,127.040982});
+
+        placeCoordinate.put("월드컵경기장",new double[]{37.568403,126.896931});
+        placeCoordinate.put("월드컵 경기장",new double[]{37.568403,126.896931});
+
+        placeCoordinate.put("키에리",new double[]{37.533381,126.993136});
+
+        placeCoordinate.put("석촌호수",new double[]{37.511676,127.103444});
+        placeCoordinate.put("석촌 호수",new double[]{37.511676,127.103444});
+        placeCoordinate.put("석촌 호수 공원 ",new double[]{37.511676,127.103444});
+        placeCoordinate.put("석촌호수공원 ",new double[]{37.511676,127.103444});
     }
 
 
     //데이터 저장할 때
     @Transactional
-    public returnReviewDataDTO saveReview(HttpSession session, String startPlace, String endPlace, String content, String routePoint) { //
+    public returnReviewDataDTO saveReview(String email, String startPlace, String endPlace, String content, String routePoint) { //
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", endPlace);
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", content);
@@ -56,12 +108,13 @@ public class ReviewService {
 
         Review review = new Review();
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
-
+/**
         //1. 세션에서 이메일 추출하기
         String email = (String) session.getAttribute("loginEmail");
         log.info("checklog: ReviewService_saveReview-loginEmail : {}", email);
         //전달받은 데이터 예외처리
         log.info("checklog: ReviewService_saveReview-ReviewService");
+ */
 
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
         Optional<Member> writerInfo = memberService.findByEmail(email);
@@ -97,6 +150,14 @@ public class ReviewService {
         return returnReviewDataDTO;
     }
 
+
+
+
+    //장소 좌표 매칭
+    public double[] findPoint(String placeName) {
+        log.info("placeName = {}",placeName);
+        return placeCoordinate.get(placeName);
+    }
 
 
     /**상세조회 관련 메서드*/

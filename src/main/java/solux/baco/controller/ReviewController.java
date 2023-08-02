@@ -55,14 +55,15 @@ public class ReviewController {
     //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
     @PostMapping("/save")
     @ResponseBody
-    public ResponseEntity<SavedReviewDataDTO> saveReviewController(HttpSession session,@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    public ResponseEntity<SavedReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑. //HttpSession session,
         //
 
-         String email = (String) session.getAttribute("loginEmail");
-         log.info("session->email : {}",email);
+         //String email = (String) session.getAttribute("loginEmail");
+         //log.info("session->email : {}",email);
          log.info("requestBody data-content : {}",reviewData.getContent());
          log.info("requestBody data-startPlace : {}",reviewData.getStartPlace());
          log.info("requestBody data-endPlace : {}",reviewData.getEndPlace());
+         log.info("requestBody data-email : {}",reviewData.getEmail());
 
          try {
             String mapUrl;
@@ -73,15 +74,23 @@ public class ReviewController {
             String startPlace = reviewData.getStartPlace();
             String endPlace = reviewData.getEndPlace();
             String content = reviewData.getContent();
+            String email = reviewData.getEmail();
             log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
+
+
+            //출발지 도착지 장소명과 좌표 매핑하기
+             double[] startPoint = reviewService.findPoint(startPlace);
+             double[] endPoint = reviewService.findPoint(endPlace);
+
+             //
 
 
             //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
             WebClient webClient = WebClient.create();
 
             String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
-            double[] startParameter = {37.56640973022008, 126.97857314414601}; //ex-"127.12345, 37.12345"
-            double[] endParameter = {37.57621220811897, 126.97672509786915}; //ex-"128.12345,38.12345"
+            double[] startParameter = {startPoint[0], startPoint[1]}; //ex-"127.12345, 37.12345"
+            double[] endParameter = {endPoint[0], endPoint[1]}; //ex-"128.12345,38.12345"
 
             //요청 파라미터 설정 => url 쿼리 스트링 파라미터
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
@@ -101,7 +110,7 @@ public class ReviewController {
             //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
             //ReviewService 호출
             //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString); //
+            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(email,startPlace, endPlace, content, routePointString); //
 
             //review_id 구하기
             //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!

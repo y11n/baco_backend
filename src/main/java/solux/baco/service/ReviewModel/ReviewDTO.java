@@ -17,6 +17,17 @@ public class ReviewDTO {
 
     private String content;
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // 8/2 추가
+    private String email;
+
     public void setStartPlace(String startPlace) {
         this.startPlace = startPlace;
     }
