@@ -4,6 +4,7 @@ package solux.baco.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import solux.baco.domain.Member;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
