@@ -15,6 +15,7 @@ import solux.baco.service.MemberService;
 import solux.baco.service.ReviewService;
 
 import javax.swing.text.html.Option;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,14 +43,16 @@ public class MypageController {
     //memberId 사용하지 않고 나의 작성목록 조회
     @GetMapping("/My-reviews")
     public List<Review> showReviews1(HttpSession session){
-        log.info("run showReviews1");
         String myEmail = (String) session.getAttribute("loginEmail");
-        log.info("session.getAttribute(\"loginEmail\")");
         presentMember = memberService.findByEmail(myEmail);
-        log.info("memberService.findByEmail(myEmail)");
-        Long memberId = presentMember.get().getMember_id();
-        log.info("presentMember.get().getMember_id()");
-        return reviewService.findReviews(memberId);
+        if(presentMember.isPresent()){
+            Long memberId = presentMember.get().getMember_id();
+            return reviewService.findReviews(memberId);
+        }
+        else{
+            return Collections.emptyList();
+        }
+
     }
 
     //memeberId 사용하여 나의 작성목록 조회
