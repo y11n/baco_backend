@@ -32,12 +32,24 @@ public class MypageController {
     private final LoginService loginService;
     private Optional<Member> presentMember;
 
-    @PostMapping("/MemberInfo-change")
-    public Optional<Member> updateMemberInfo(@RequestBody PasswordForm form, HttpSession session){
+
+    //memberId 사용하지 않고 회원정보 수정
+    /**
+     * @PostMapping("/MemberInfo-change")
+    public Optional<Member> updateMemberInfo1(@RequestBody PasswordForm form, HttpSession session){
         String myEmail = (String) session.getAttribute("loginEmail");
         Optional<Member> presentMember = memberService.findByEmail(myEmail);
         memberService.memberInfoUpdate(form, presentMember);
         return memberService.findByEmail(myEmail);
+    }
+    */
+
+    //memberId 사용하여 회원정보 수정
+    @PostMapping("/MemberInfo-change/{member_id}")
+    public Member updateMemberInfo2(@PathVariable("member_id")Long member_id, @RequestBody PasswordForm form){
+        Member member1 = memberService.findOne(member_id);
+        memberService.memberInfoUpdate(form, member1);
+        return memberService.findOne(member_id);
     }
 
     //memberId 사용하지 않고 나의 작성목록 조회

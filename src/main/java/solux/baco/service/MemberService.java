@@ -36,12 +36,12 @@ public class MemberService {
     public Optional<Member> findByEmail(String email){
         return memberRepository.findByEmail(email);}
 
-    public void memberInfoUpdate(PasswordForm form, Optional<Member> presentMember) {
+    public void memberInfoUpdate(PasswordForm form, Member presentMember) {
         //예외 처리 필요함...
         password_check(form.getNewPassword(), form.getNewPasswordConfirm());
         Member updateMember = new Member();
-        updateMember.setMember_id(presentMember.get().getMember_id());
-        updateMember.setEmail(presentMember.get().getEmail());
+        updateMember.setMember_id(presentMember.getMember_id());
+        updateMember.setEmail(presentMember.getEmail());
         updateMember.setNickname(form.getNewNickname());
         updateMember.setPassword(form.getNewPassword());
         updateMember.setPassword2(form.getNewPasswordConfirm());
