@@ -42,9 +42,13 @@ public class MypageController {
     //memberId 사용하지 않고 나의 작성목록 조회
     @GetMapping("/My-reviews")
     public List<Review> showReviews1(HttpSession session){
+        log.info("run showReviews1");
         String myEmail = (String) session.getAttribute("loginEmail");
+        log.info("session.getAttribute(\"loginEmail\")");
         presentMember = memberService.findByEmail(myEmail);
+        log.info("memberService.findByEmail(myEmail)");
         Long memberId = presentMember.get().getMember_id();
+        log.info("presentMember.get().getMember_id()");
         return reviewService.findReviews(memberId);
     }
 
