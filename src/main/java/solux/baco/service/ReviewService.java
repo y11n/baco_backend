@@ -154,9 +154,30 @@ public class ReviewService {
 
 
     //장소 좌표 매칭
-    public double[] findPoint(String placeName) {
+    public  Optional<double[]> findPoint(String placeName) {
         log.info("placeName = {}",placeName);
-        return placeCoordinate.get(placeName);
+        String lowercasePlaceName = placeName.toLowerCase();
+
+       Optional<double[]> coordinate = null;
+       for (Map.Entry<String,double[]> entry : placeCoordinate.entrySet()) {
+           //lowercase 상태에서 키 값을 먼저 비교한 다음
+           if (entry.getKey().toLowerCase().equals(lowercasePlaceName)) {
+               //같은 키값일 때의 좌표를 반환
+               coordinate = Optional.of(entry.getValue());
+               log.info("coordinate = {}",coordinate);
+
+                if (coordinate != null && coordinate.isPresent()) {
+                    double[] coordinateArray = coordinate.get();
+                    log.info("coordinateArray = {}",coordinateArray);
+                    //return coordinateArray;
+                }
+
+           }
+           else {
+               //예외처리
+           }
+       }
+   return coordinate; //예외처리
     }
 
 
