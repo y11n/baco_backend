@@ -3,11 +3,13 @@ package solux.baco.service.ReviewModel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
+@Component
 public class ReviewDTO {
-
+//후기작성 데이터 받아올 때
 
     private String startPlace;
 
