@@ -12,6 +12,7 @@ import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.service.LoginService;
 import solux.baco.service.MemberService;
+import solux.baco.service.ReviewModel.ReviewListDTO;
 import solux.baco.service.ReviewService;
 
 import javax.swing.text.html.Option;
@@ -54,7 +55,7 @@ public class MypageController {
 
     //memberId 사용하지 않고 나의 작성목록 조회
     @GetMapping("/My-reviews")
-    public List<Review> showReviews1(HttpSession session){
+    public List<ReviewListDTO> showReviews1(HttpSession session){
         String myEmail = (String) session.getAttribute("loginEmail");
         presentMember = memberService.findByEmail(myEmail);
         if(presentMember.isPresent()){
@@ -69,7 +70,7 @@ public class MypageController {
 
     //memeberId 사용하여 나의 작성목록 조회
     @GetMapping("/My-reviews/{member_id}")
-    public List<Review> showReviews2(@PathVariable("member_id")Long member_id){
+    public List<ReviewListDTO> showReviews2(@PathVariable("member_id")Long member_id){
         return reviewService.findReviews(member_id);
     }
 

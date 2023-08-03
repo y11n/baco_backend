@@ -20,6 +20,7 @@ public class ReviewBoardController {
         this.reviewService = reviewService;
     }
 
+    /**후기공유게시판 기본보기 목록*/
     @GetMapping("/reviewBoard")
     public List<ReviewListDTO> reviewBoardController(){
         return reviewService.allReviews();

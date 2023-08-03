@@ -38,8 +38,9 @@ public class ReviewRepository {
 
     /**
      * 후기 저장 메서드
+     * //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
      */
-    //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
+
     public Long save(Review review) {
 
         log.info("checklog: ReviewRepository_save-review.getEndPlace: {}", review.getEndPlace());
@@ -91,23 +92,31 @@ public class ReviewRepository {
     }
 
 
+    /**작성자 후기 상세조회 */
 
     public Review findOne(Long reviewId) {
         return entityManager.find(Review.class, reviewId);
     }
 
-    public List<Review> findMemberReviews(Long memberId) {
-        return entityManager.createQuery("select m from Review m where m.member.member_id = :memberId", Review.class)
-                .setParameter("memberId", memberId)
-                .getResultList();
+    /**작성자 후기 목록 조회 */
+    public List<Object[]> findMemberReviews(Long memberId) {
+        String jpql = String.format("SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r Join r.member m WHERE r.member.member_id=%d",memberId);
+        TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);
+        return query.getResultList();
+
     }
 
-    public List<Review> findHashtagReviews(String hashtag) {
-        return entityManager.createQuery("select m from Review m where m.hashtag = :hashtag", Review.class)
-                .setParameter("hashtag", hashtag)
-                .getResultList();
+    /**해시태그 필터링 목록 조회*/
+    public List<Object[]>  findHashtagReviews(String hashtag) {
+        String jpql = "SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r JOIN r.member m WHERE r.hashtag = :hashtag";
+        TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);
+        query.setParameter("hashtag", hashtag);
+        return query.getResultList();
+
     }
 
+    /**전체 후기 목록 조회*/
+    /*
     public List<Review> getAllReviews(){
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Review> cq = cb.createQuery(Review.class);
@@ -123,7 +132,7 @@ public class ReviewRepository {
         cq.select(root);
         return entityManager.createQuery(cq).getResultList();
     }
-
+*/
     public List<Object[]> findJoinEntity(){
         String jpql = "SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r Join r.member m";
         TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);

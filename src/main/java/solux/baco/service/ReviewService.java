@@ -42,7 +42,7 @@ public class ReviewService {
         this.memberService = memberService;
         this.reviewDetailDTO = reviewDetailDTO;
 
-        //장소 매칭 좌표
+        /**미리 준비한 장소와 좌표 */
         placeCoordinate.put("숙명여대", new double[]{37.54167, 126.964930});
         placeCoordinate.put("숙명 여대", new double[]{37.54167, 126.964930});
         placeCoordinate.put("숙대", new double[]{37.54167, 126.964930});
@@ -95,7 +95,9 @@ public class ReviewService {
     }
 
 
-    //데이터 저장할 때
+    /**
+     * 후기 저장 메서드
+     */
     @Transactional
     public returnReviewDataDTO saveReview(String email, String startPlace, String endPlace, String content, String routePoint) { //
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", startPlace);
@@ -149,7 +151,9 @@ public class ReviewService {
     }
 
 
-    //장소 좌표 매칭
+    /**
+     * 미리 준비한 장소와 좌표를 매핑하는 과정
+     */
     public Optional<double[]> findPoint(String placeName) {
         log.info("placeName = {}", placeName);
         String lowercasePlaceName = placeName.toLowerCase();
@@ -180,8 +184,9 @@ public class ReviewService {
      * 상세조회 관련 메서드
      */
 
-
-    //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
+    /**
+     * review_id에 해당하는 경로 데이터만 빼오는 메서드(html에 경로를 넘기기 위한 과정임)
+     */
     public String getJsonData(Long review_id) {
         log.info("checklog: ReviewService_getJsonData");
 
@@ -196,7 +201,16 @@ public class ReviewService {
         }
     }
 
-    //(데이터 빼올 때 )
+    /**
+     * 마이페이지_나의 후기 보기 목록 중 작성자 후기 상세조회
+     */
+    public Review findReview(Long reviewId) {
+        return reviewRepository.findOne(reviewId);
+    }
+
+    /**
+     * 후기 공유 게시판 기본 목록 or 해시태그 필터링 목록 중 후기 상세조회
+     */
     public ReviewDetailDTO reviewDetail(Long review_id, String mapUrl) {
         ReviewDetailDTO reviewDetailDTO = new ReviewDetailDTO();
         log.info("checklog: ReviewService_getJsonData-review_id: {}", review_id);
@@ -233,23 +247,9 @@ public class ReviewService {
     }
 
 
-
-
-
-
-    public Review findReview(Long reviewId) {
-        return reviewRepository.findOne(reviewId);
-    }
-
-    public List<Review> findReviews(Long memberId) {
-        return reviewRepository.findMemberReviews(memberId);
-    }
-
-    public List<Review> findHashtagReviews(String hashtag) {
-        return reviewRepository.findHashtagReviews(hashtag);
-    }
-
-
+    /**
+     * html동적 렌더링 (db에서 string 값을 빼온 후 객체형태로 변경)
+     */
     public Double[][] makeArray(String jsonData) {
         log.info("checklog: ReviewService_makeArray");
 
@@ -266,23 +266,78 @@ public class ReviewService {
     }
 
 
+    /**
+     * 전체 후기 목록 조회
+     */
     public List<ReviewListDTO> allReviews() {
         //Join된 테이블 요소를 List형태로 받아옴
         List<Object[]> allReviewList = reviewRepository.findJoinEntity();
         //(반환할) List형태의 ReviewListDTO를 생성
         List<ReviewListDTO> reviewListDTOs = new ArrayList<>();
         //allReviewList에 담아온 값들을 한 레코드씩 돌면서 하나의 객체를 완성
-        for (Object[] data : allReviewList){
+        for (Object[] data : allReviewList) {
             ReviewListDTO oneReviewListDTO = new ReviewListDTO();
-            oneReviewListDTO.setReview_id((Long)data[0]);
-            oneReviewListDTO.setStartPlace((String)data[1]);
-            oneReviewListDTO.setEndPlace((String)data[2]);
-            oneReviewListDTO.setDate((LocalDate)data[3]);
-            oneReviewListDTO.setHashtag((String)data[4]);
-            oneReviewListDTO.setNickname((String)data[5]);
+            oneReviewListDTO.setReview_id((Long) data[0]);
+            oneReviewListDTO.setStartPlace((String) data[1]);
+            oneReviewListDTO.setEndPlace((String) data[2]);
+            oneReviewListDTO.setDate((LocalDate) data[3]);
+            oneReviewListDTO.setHashtag((String) data[4]);
+            oneReviewListDTO.setNickname((String) data[5]);
 
             reviewListDTOs.add(oneReviewListDTO);
         }
         return reviewListDTOs;
     }
+
+
+    //반환값 수정한 부분
+
+    /**
+     * 작성자 후기 목록 조회
+     */
+
+    public List<ReviewListDTO> findReviews(Long memberId) {
+
+        List<Object[]> memberIdReviewList = reviewRepository.findMemberReviews(memberId);
+        //(반환할) List형태의 memberIdReviewListDTOs 를 생성
+        List<ReviewListDTO> memberIdReviewListDTOs = new ArrayList<>();
+        //memberIdReviewList에 담아온 값들을 한 레코드씩 돌면서 하나의 객체를 완성
+        for (Object[] data : memberIdReviewList) {
+            ReviewListDTO oneMemberIdReviewListDTO = new ReviewListDTO();
+            oneMemberIdReviewListDTO.setReview_id((Long) data[0]);
+            oneMemberIdReviewListDTO.setStartPlace((String) data[1]);
+            oneMemberIdReviewListDTO.setEndPlace((String) data[2]);
+            oneMemberIdReviewListDTO.setDate((LocalDate) data[3]);
+            oneMemberIdReviewListDTO.setHashtag((String) data[4]);
+            oneMemberIdReviewListDTO.setNickname((String) data[5]);
+
+            memberIdReviewListDTOs.add(oneMemberIdReviewListDTO);
+        }
+        return memberIdReviewListDTOs;
+    }
+
+
+    /**
+     * 해시태그 필터링 조회
+     */
+    public List<ReviewListDTO> findHashtagReviews(String hashtag) {
+        List<Object[]> hashtagReviewList = reviewRepository.findHashtagReviews(hashtag);
+        //(반환할) List형태의 hashtagReviewListDTOs 를 생성
+        List<ReviewListDTO> hashtagReviewListDTOs = new ArrayList<>();
+        //hashtagReviewList에 담아온 값들을 한 레코드씩 돌면서 하나의 객체를 완성
+        for (Object[] data : hashtagReviewList) {
+            ReviewListDTO oneHashtagReviewListDTO = new ReviewListDTO();
+            oneHashtagReviewListDTO.setReview_id((Long) data[0]);
+            oneHashtagReviewListDTO.setStartPlace((String) data[1]);
+            oneHashtagReviewListDTO.setEndPlace((String) data[2]);
+            oneHashtagReviewListDTO.setDate((LocalDate) data[3]);
+            oneHashtagReviewListDTO.setHashtag((String) data[4]);
+            oneHashtagReviewListDTO.setNickname((String) data[5]);
+
+            hashtagReviewListDTOs.add(oneHashtagReviewListDTO);
+        }
+        return hashtagReviewListDTOs;
+    }
+
+
 }
