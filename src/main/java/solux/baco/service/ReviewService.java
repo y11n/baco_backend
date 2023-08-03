@@ -96,9 +96,39 @@ public class ReviewService {
 
 
     /**
-     * 후기 저장 메서드
+     * 후기 저장 메서드 (findPoint -> saveReview)
      */
-    @Transactional
+
+
+    /**
+     * 미리 준비한 장소와 좌표를 매핑하는 과정
+     */
+    public Optional<double[]> findPoint(String placeName) {
+        log.info("placeName = {}", placeName);
+        String lowercasePlaceName = placeName.toLowerCase();
+
+        Optional<double[]> coordinate = null;
+        for (Map.Entry<String, double[]> entry : placeCoordinate.entrySet()) {
+            //lowercase 상태에서 키 값을 먼저 비교한 다음
+            if (entry.getKey().toLowerCase().equals(lowercasePlaceName)) {
+                //같은 키값일 때의 좌표를 반환
+                coordinate = Optional.of(entry.getValue());
+                log.info("coordinate = {}", coordinate);
+
+                if (coordinate != null && coordinate.isPresent()) {
+                    double[] coordinateArray = coordinate.get();
+                    log.info("coordinateArray = {}", coordinateArray);
+                    //return coordinateArray;
+                }
+
+            } else {
+                //예외처리
+            }
+        }
+        return coordinate; //예외처리
+    }
+
+    /**후기 저장 메서드*/
     public returnReviewDataDTO saveReview(String email, String startPlace, String endPlace, String content, String routePoint) { //
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", startPlace);
         log.info("checklog: ReviewService_saveReview-review.setRoutePoint(routePoint): {}", endPlace);
@@ -151,33 +181,6 @@ public class ReviewService {
     }
 
 
-    /**
-     * 미리 준비한 장소와 좌표를 매핑하는 과정
-     */
-    public Optional<double[]> findPoint(String placeName) {
-        log.info("placeName = {}", placeName);
-        String lowercasePlaceName = placeName.toLowerCase();
-
-        Optional<double[]> coordinate = null;
-        for (Map.Entry<String, double[]> entry : placeCoordinate.entrySet()) {
-            //lowercase 상태에서 키 값을 먼저 비교한 다음
-            if (entry.getKey().toLowerCase().equals(lowercasePlaceName)) {
-                //같은 키값일 때의 좌표를 반환
-                coordinate = Optional.of(entry.getValue());
-                log.info("coordinate = {}", coordinate);
-
-                if (coordinate != null && coordinate.isPresent()) {
-                    double[] coordinateArray = coordinate.get();
-                    log.info("coordinateArray = {}", coordinateArray);
-                    //return coordinateArray;
-                }
-
-            } else {
-                //예외처리
-            }
-        }
-        return coordinate; //예외처리
-    }
 
 
     /**
