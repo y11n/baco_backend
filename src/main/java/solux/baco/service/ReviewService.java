@@ -14,15 +14,13 @@ import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.repository.ReviewRepository;
 import solux.baco.service.ReviewModel.ReviewDetailDTO;
+import solux.baco.service.ReviewModel.ReviewListDTO;
 import solux.baco.service.ReviewModel.returnReviewDataDTO;
 import solux.baco.service.RouteModel.JsonDataEntity;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import java.util.List;
 
@@ -45,55 +43,55 @@ public class ReviewService {
         this.reviewDetailDTO = reviewDetailDTO;
 
         //장소 매칭 좌표
-        placeCoordinate.put("숙명여대",new double[]{37.54167,126.964930});
-        placeCoordinate.put("숙명 여대",new double[]{37.54167,126.964930});
-        placeCoordinate.put("숙대",new double[]{37.54167,126.964930});
-        placeCoordinate.put("숙명여자대학교",new double[]{37.54167,126.964930});
-        placeCoordinate.put("숙명 여자대학교",new double[]{37.54167,126.964930});
-        placeCoordinate.put("숙명여자 대학교",new double[]{37.54167,126.964930});
+        placeCoordinate.put("숙명여대", new double[]{37.54167, 126.964930});
+        placeCoordinate.put("숙명 여대", new double[]{37.54167, 126.964930});
+        placeCoordinate.put("숙대", new double[]{37.54167, 126.964930});
+        placeCoordinate.put("숙명여자대학교", new double[]{37.54167, 126.964930});
+        placeCoordinate.put("숙명 여자대학교", new double[]{37.54167, 126.964930});
+        placeCoordinate.put("숙명여자 대학교", new double[]{37.54167, 126.964930});
 
-        placeCoordinate.put("남산타워",new double[]{37.549180,126.989704});
-        placeCoordinate.put("남산 타워",new double[]{37.549180,126.989704});
-        placeCoordinate.put("N서울타워",new double[]{37.549180,126.989704});
-        placeCoordinate.put("N 서울 타워",new double[]{37.549180,126.989704});
-        placeCoordinate.put("N서울 타워",new double[]{37.549180,126.989704});
+        placeCoordinate.put("남산타워", new double[]{37.549180, 126.989704});
+        placeCoordinate.put("남산 타워", new double[]{37.549180, 126.989704});
+        placeCoordinate.put("N서울타워", new double[]{37.549180, 126.989704});
+        placeCoordinate.put("N 서울 타워", new double[]{37.549180, 126.989704});
+        placeCoordinate.put("N서울 타워", new double[]{37.549180, 126.989704});
 
-        placeCoordinate.put("청계천",new double[]{37.569225,126.978628});
+        placeCoordinate.put("청계천", new double[]{37.569225, 126.978628});
 
-        placeCoordinate.put("경복궁",new double[]{37.57621220811897, 126.97672509786915});
+        placeCoordinate.put("경복궁", new double[]{37.57621220811897, 126.97672509786915});
 
-        placeCoordinate.put("어린이대공원",new double[]{37.549785,127.081546});
-        placeCoordinate.put("어린이 대공원",new double[]{37.549785,127.081546});
-        placeCoordinate.put("서울어린이대공원",new double[]{37.549785,127.081546});
+        placeCoordinate.put("어린이대공원", new double[]{37.549785, 127.081546});
+        placeCoordinate.put("어린이 대공원", new double[]{37.549785, 127.081546});
+        placeCoordinate.put("서울어린이대공원", new double[]{37.549785, 127.081546});
 
-        placeCoordinate.put("홍대",new double[]{37.550768,126.925639});
-        placeCoordinate.put("홍익대학교",new double[]{37.550768,126.925639});
-        placeCoordinate.put("홍익 대학교",new double[]{37.550768,126.925639});
+        placeCoordinate.put("홍대", new double[]{37.550768, 126.925639});
+        placeCoordinate.put("홍익대학교", new double[]{37.550768, 126.925639});
+        placeCoordinate.put("홍익 대학교", new double[]{37.550768, 126.925639});
 
-        placeCoordinate.put("서울시청",new double[]{37.56640973022008, 126.97857314414601});
-        placeCoordinate.put("서울 시청",new double[]{37.56640973022008, 126.97857314414601});
-        placeCoordinate.put("서울 특별 시청",new double[]{37.56640973022008, 126.97857314414601});
-        placeCoordinate.put("서울특별시청",new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울시청", new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울 시청", new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울 특별 시청", new double[]{37.56640973022008, 126.97857314414601});
+        placeCoordinate.put("서울특별시청", new double[]{37.56640973022008, 126.97857314414601});
 
-        placeCoordinate.put("여의도 한강공원",new double[]{37.528409,126.933089});
-        placeCoordinate.put("여의도한강 공원",new double[]{37.528409,126.933089});
-        placeCoordinate.put("여의도 한강 공원",new double[]{37.528409,126.933089});
-        placeCoordinate.put("한강공원",new double[]{37.528409,126.933089});
-        placeCoordinate.put("한강 공원",new double[]{37.528409,126.933089});
-        placeCoordinate.put("한강",new double[]{37.528409,126.933089});
+        placeCoordinate.put("여의도 한강공원", new double[]{37.528409, 126.933089});
+        placeCoordinate.put("여의도한강 공원", new double[]{37.528409, 126.933089});
+        placeCoordinate.put("여의도 한강 공원", new double[]{37.528409, 126.933089});
+        placeCoordinate.put("한강공원", new double[]{37.528409, 126.933089});
+        placeCoordinate.put("한강 공원", new double[]{37.528409, 126.933089});
+        placeCoordinate.put("한강", new double[]{37.528409, 126.933089});
 
-        placeCoordinate.put("서울숲",new double[]{37.545020,127.040982});
-        placeCoordinate.put("서울 숲",new double[]{37.545020,127.040982});
+        placeCoordinate.put("서울숲", new double[]{37.545020, 127.040982});
+        placeCoordinate.put("서울 숲", new double[]{37.545020, 127.040982});
 
-        placeCoordinate.put("월드컵경기장",new double[]{37.568403,126.896931});
-        placeCoordinate.put("월드컵 경기장",new double[]{37.568403,126.896931});
+        placeCoordinate.put("월드컵경기장", new double[]{37.568403, 126.896931});
+        placeCoordinate.put("월드컵 경기장", new double[]{37.568403, 126.896931});
 
-        placeCoordinate.put("키에리",new double[]{37.533381,126.993136});
+        placeCoordinate.put("키에리", new double[]{37.533381, 126.993136});
 
-        placeCoordinate.put("석촌호수",new double[]{37.511676,127.103444});
-        placeCoordinate.put("석촌 호수",new double[]{37.511676,127.103444});
-        placeCoordinate.put("석촌 호수 공원 ",new double[]{37.511676,127.103444});
-        placeCoordinate.put("석촌호수공원 ",new double[]{37.511676,127.103444});
+        placeCoordinate.put("석촌호수", new double[]{37.511676, 127.103444});
+        placeCoordinate.put("석촌 호수", new double[]{37.511676, 127.103444});
+        placeCoordinate.put("석촌 호수 공원 ", new double[]{37.511676, 127.103444});
+        placeCoordinate.put("석촌호수공원 ", new double[]{37.511676, 127.103444});
     }
 
 
@@ -109,11 +107,11 @@ public class ReviewService {
         Review review = new Review();
         returnReviewDataDTO returnReviewDataDTO = new returnReviewDataDTO();
 /**
-        //1. 세션에서 이메일 추출하기
-        String email = (String) session.getAttribute("loginEmail");
-        log.info("checklog: ReviewService_saveReview-loginEmail : {}", email);
-        //전달받은 데이터 예외처리
-        log.info("checklog: ReviewService_saveReview-ReviewService");
+ //1. 세션에서 이메일 추출하기
+ String email = (String) session.getAttribute("loginEmail");
+ log.info("checklog: ReviewService_saveReview-loginEmail : {}", email);
+ //전달받은 데이터 예외처리
+ log.info("checklog: ReviewService_saveReview-ReviewService");
  */
 
         //2. 이메일을 통해서 작성자의 Member객체 받아오기
@@ -151,39 +149,36 @@ public class ReviewService {
     }
 
 
-
-
     //장소 좌표 매칭
-    public  Optional<double[]> findPoint(String placeName) {
-        log.info("placeName = {}",placeName);
+    public Optional<double[]> findPoint(String placeName) {
+        log.info("placeName = {}", placeName);
         String lowercasePlaceName = placeName.toLowerCase();
 
-       Optional<double[]> coordinate = null;
-       for (Map.Entry<String,double[]> entry : placeCoordinate.entrySet()) {
-           //lowercase 상태에서 키 값을 먼저 비교한 다음
-           if (entry.getKey().toLowerCase().equals(lowercasePlaceName)) {
-               //같은 키값일 때의 좌표를 반환
-               coordinate = Optional.of(entry.getValue());
-               log.info("coordinate = {}",coordinate);
+        Optional<double[]> coordinate = null;
+        for (Map.Entry<String, double[]> entry : placeCoordinate.entrySet()) {
+            //lowercase 상태에서 키 값을 먼저 비교한 다음
+            if (entry.getKey().toLowerCase().equals(lowercasePlaceName)) {
+                //같은 키값일 때의 좌표를 반환
+                coordinate = Optional.of(entry.getValue());
+                log.info("coordinate = {}", coordinate);
 
                 if (coordinate != null && coordinate.isPresent()) {
                     double[] coordinateArray = coordinate.get();
-                    log.info("coordinateArray = {}",coordinateArray);
+                    log.info("coordinateArray = {}", coordinateArray);
                     //return coordinateArray;
                 }
 
-           }
-           else {
-               //예외처리
-           }
-       }
-   return coordinate; //예외처리
+            } else {
+                //예외처리
+            }
+        }
+        return coordinate; //예외처리
     }
 
 
-    /**상세조회 관련 메서드*/
-
-
+    /**
+     * 상세조회 관련 메서드
+     */
 
 
     //컨트롤러에서 호출당하는메서드(경로데이터 빼올 때)
@@ -220,16 +215,12 @@ public class ReviewService {
                 //Long member_id = review.getMember().getMember_id();
 
 
-
                 reviewDetailDTO.setContent(content);
                 reviewDetailDTO.setMapUrl(mapUrl);
                 //log.info("checklog: ReviewService_reviewDetail-startPlace: {}", startPlace);
                 //log.info("checklog: ReviewService_reviewDetail-endPlace: {}", endPlace);
                 log.info("checklog: ReviewService_getJsonData-content: {}", content);
                 log.info("checklog: ReviewService_getJsonData-mapUrl: {}", mapUrl);
-
-
-
 
 
             }
@@ -242,7 +233,11 @@ public class ReviewService {
     }
 
 
-    public Review findReview(Long reviewId){
+
+
+
+
+    public Review findReview(Long reviewId) {
         return reviewRepository.findOne(reviewId);
     }
 
@@ -266,7 +261,28 @@ public class ReviewService {
             jsonDataArray[i][0] = innerArray.getDouble(0);
             jsonDataArray[i][1] = innerArray.getDouble(1);
         }
-        log.info("checklog: ReviewService_makeArray-jsonDataArray:{}",jsonDataArray);
+        log.info("checklog: ReviewService_makeArray-jsonDataArray:{}", jsonDataArray);
         return jsonDataArray;
+    }
+
+
+    public List<ReviewListDTO> allReviews() {
+        //Join된 테이블 요소를 List형태로 받아옴
+        List<Object[]> allReviewList = reviewRepository.findJoinEntity();
+        //(반환할) List형태의 ReviewListDTO를 생성
+        List<ReviewListDTO> reviewListDTOs = new ArrayList<>();
+        //allReviewList에 담아온 값들을 한 레코드씩 돌면서 하나의 객체를 완성
+        for (Object[] data : allReviewList){
+            ReviewListDTO oneReviewListDTO = new ReviewListDTO();
+            oneReviewListDTO.setReview_id((Long)data[0]);
+            oneReviewListDTO.setStartPlace((String)data[1]);
+            oneReviewListDTO.setEndPlace((String)data[2]);
+            oneReviewListDTO.setDate((LocalDate)data[3]);
+            oneReviewListDTO.setHashtag((String)data[4]);
+            oneReviewListDTO.setNickname((String)data[5]);
+
+            reviewListDTOs.add(oneReviewListDTO);
+        }
+        return reviewListDTOs;
     }
 }

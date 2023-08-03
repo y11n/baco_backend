@@ -235,5 +235,4 @@ public class ReviewController {
     public List<Review> showReviews_hashtag(@RequestParam String hashtag) {
         return reviewService.findHashtagReviews(hashtag);
     }
-
 }

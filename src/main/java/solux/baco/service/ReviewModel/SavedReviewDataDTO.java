@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SavedReviewDataDTO {
-    //게시글 상세보기로 반환할 값 모음
+    //후기 저장하고 다시 반환할 때
 
     public void setStartPlace(String startPlace) {
         this.startPlace = startPlace;

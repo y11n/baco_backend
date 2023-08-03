@@ -3,6 +3,10 @@ package solux.baco.repository;
 import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -103,6 +107,28 @@ public class ReviewRepository {
                 .setParameter("hashtag", hashtag)
                 .getResultList();
     }
+
+    public List<Review> getAllReviews(){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Review> cq = cb.createQuery(Review.class);
+        Root<Review> root = cq.from(Review.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    public List<Member> findNicknameAllReviews(){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> root = cq.from(Member.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    public List<Object[]> findJoinEntity(){
+        String jpql = "SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r Join r.member m";
+        TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);
+        return query.getResultList();
+        }
 
 }
 
