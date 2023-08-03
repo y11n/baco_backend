@@ -3,6 +3,10 @@ package solux.baco.repository;
 import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,8 +38,9 @@ public class ReviewRepository {
 
     /**
      * 후기 저장 메서드
+     * //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
      */
-    //저장 결과를 다시 클라이언트 측에 나타내기 위해서 다시 반환.
+
     public Long save(Review review) {
 
         log.info("checklog: ReviewRepository_save-review.getEndPlace: {}", review.getEndPlace());
@@ -45,8 +50,8 @@ public class ReviewRepository {
         log.info("checklog: ReviewRepository_save-review.getRoutePoint: {}", review.getRoute_point());
 
 
-        String sql = "INSERT INTO review (member_id,content,start_place,end_place, date,route_point) VALUES (?, ?, ?, ? , ?, ?)";
-        jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(), review.getRoute_point());
+        //String sql = "INSERT INTO review (member_id,content,start_place,end_place, date,route_point) VALUES (?, ?, ?, ? , ?, ?)";
+        //jdbcTemplate.update(sql, review.getMember().getMember_id(), review.getContent(), review.getStartPlace(), review.getEndPlace(), review.getDate(), review.getRoute_point());
 
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("review").usingGeneratedKeyColumns("review_id");
 
@@ -87,22 +92,52 @@ public class ReviewRepository {
     }
 
 
+    /**작성자 후기 상세조회 */
 
     public Review findOne(Long reviewId) {
         return entityManager.find(Review.class, reviewId);
     }
 
-    public List<Review> findMemberReviews(Long memberId) {
-        return entityManager.createQuery("select m from Review m where m.member.member_id = :memberId", Review.class)
-                .setParameter("memberId", memberId)
-                .getResultList();
+    /**작성자 후기 목록 조회 */
+    public List<Object[]> findMemberReviews(Long memberId) {
+        String jpql = String.format("SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r Join r.member m WHERE r.member.member_id=%d",memberId);
+        TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);
+        return query.getResultList();
+
     }
 
-    public List<Review> findHashtagReviews(String hashtag) {
-        return entityManager.createQuery("select m from Review m where m.hashtag = :hashtag", Review.class)
-                .setParameter("hashtag", hashtag)
-                .getResultList();
+    /**해시태그 필터링 목록 조회*/
+    public List<Object[]>  findHashtagReviews(String hashtag) {
+        String jpql = "SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r JOIN r.member m WHERE r.hashtag = :hashtag";
+        TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);
+        query.setParameter("hashtag", hashtag);
+        return query.getResultList();
+
     }
+
+    /**전체 후기 목록 조회*/
+    /*
+    public List<Review> getAllReviews(){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Review> cq = cb.createQuery(Review.class);
+        Root<Review> root = cq.from(Review.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    public List<Member> findNicknameAllReviews(){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> root = cq.from(Member.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
+    }
+*/
+    public List<Object[]> findJoinEntity(){
+        String jpql = "SELECT r.review_id, r.startPlace, r.endPlace, r.date, r.hashtag, m.nickname FROM Review r Join r.member m";
+        TypedQuery<Object[]> query = entityManager.createQuery(jpql, Object[].class);
+        return query.getResultList();
+        }
 
 }
 

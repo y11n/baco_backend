@@ -53,7 +53,7 @@ public class ReviewController {
     }
 
 
-    //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
+    /**후기 및 경로 저장(후기작성)*/
     @PostMapping("/save")
     @ResponseBody
     public ResponseEntity<SavedReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑. //HttpSession session,
@@ -184,7 +184,7 @@ public class ReviewController {
     }
 
 
-    //후기 게시글 상세 조회
+    /**후기 게시글 상세 조회*/
     @GetMapping("/detail/{review_id}")
     public ReviewDetailDTO reviewDetailContriller(@PathVariable Long review_id, Model model) {
         log.info("checklog: ReviewController_reviewDetailController");
@@ -230,10 +230,9 @@ public class ReviewController {
 
     }
 
-    //해시태그 필터링
+    /**해시태그 필터링 목록 조회*/
     @GetMapping("/reviews")
-    public List<Review> showReviews_hashtag(@RequestParam String hashtag) {
+    public List<ReviewListDTO> showReviews_hashtag(@RequestParam String hashtag) {
         return reviewService.findHashtagReviews(hashtag);
     }
-
 }
