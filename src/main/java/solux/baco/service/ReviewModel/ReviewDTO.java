@@ -3,15 +3,30 @@ package solux.baco.service.ReviewModel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
+@Component
 public class ReviewDTO {
-
+//후기작성 데이터 받아올 때
 
     private String startPlace;
 
     private String endPlace;
+
+    private String content;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // 8/2 추가
+    private String email;
 
     public void setStartPlace(String startPlace) {
         this.startPlace = startPlace;
@@ -25,7 +40,7 @@ public class ReviewDTO {
         this.content = content;
     }
 
-    private String content;
+
 
     public String getStartPlace() {
         return startPlace;

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class returnReviewDataDTO {
-    //게시글 상세보기로 반환할 값 모음
+public class SavedReviewDataDTO {
+    //후기 저장하고 다시 반환할 때
 
     public void setStartPlace(String startPlace) {
         this.startPlace = startPlace;
@@ -30,16 +30,16 @@ public class returnReviewDataDTO {
     private String content;
 
 
-
-    public Long getReview_id() {
-        return review_id;
+    public String getMapUrl() {
+        return mapUrl;
     }
 
-    public void setReview_id(Long review_id) {
-        this.review_id = review_id;
+    public void setMapUrl(String mapUrl) {
+        this.mapUrl = mapUrl;
     }
 
-    public Long review_id;
+    //7/30 추가
+    private String mapUrl;
 
 
 }

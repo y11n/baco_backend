@@ -12,9 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import solux.baco.domain.Member;
 import solux.baco.domain.Review;
 import solux.baco.service.MemberService;
-import solux.baco.service.ReviewModel.ReviewDTO;
-import solux.baco.service.ReviewModel.ReviewDetailDTO;
-import solux.baco.service.ReviewModel.returnReviewDataDTO;
+import solux.baco.service.ReviewModel.*;
 import solux.baco.service.ReviewService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,7 @@ import solux.baco.service.ReviewService;
 import solux.baco.service.RouteModel.JsonDataEntity;
 import solux.baco.service.RouteService;
 import org.springframework.ui.Model;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -54,21 +53,28 @@ public class ReviewController {
     }
 
 
-    //@GetMapping("/test")
-    public void dateTest() {
-        /**
-         //LocalDateTime 이용한 방법.
-         LocalDateTime date = LocalDateTime.now();
-         log.info("checklog: date = {}",date);
-         */
-    }
-
-
-    //후기 및 경로 저장(후기작성)=>기본기능 구현 완료
+    /**후기 및 경로 저장(후기작성)*/
     @PostMapping("/save")
-    @ResponseBody //반환 타입을 바꿔야할지?
-    public ResponseEntity<returnReviewDataDTO> saveReviewController(HttpSession session, @RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑.
+    @ResponseBody
+    public ResponseEntity<SavedReviewDataDTO> saveReviewController(@RequestBody ReviewDTO reviewData) { //@RequestBody : 요청바디와 데이터 매핑. //HttpSession session,
+        double[] startPointArray;
+        double[] endPointArray;
+
+        double startLat = 0.0;
+        double startLng = 0.0;
+
+        double endLat = 0.0;
+        double endLng = 0.0;
+
+        //String email = (String) session.getAttribute("loginEmail");
+        //log.info("session->email : {}",email);
+        log.info("requestBody data-content : {}", reviewData.getContent());
+        log.info("requestBody data-startPlace : {}", reviewData.getStartPlace());
+        log.info("requestBody data-endPlace : {}", reviewData.getEndPlace());
+        log.info("requestBody data-email : {}", reviewData.getEmail());
+
         try {
+            String mapUrl;
             //log.info("checklog: email:{}, reviewData:{}",email,reviewData);
             //예외처리
 
@@ -76,39 +82,97 @@ public class ReviewController {
             String startPlace = reviewData.getStartPlace();
             String endPlace = reviewData.getEndPlace();
             String content = reviewData.getContent();
-            log.info("checklog: startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
+            String email = reviewData.getEmail();
+            log.info("checklog: ReviewController_saveReviewController-startPlace:{},endPlace:{},content:{}", startPlace, endPlace, content);
 
 
-            //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
-            WebClient webClient = WebClient.create();
+            //출발지 도착지 장소명과 좌표 매핑하기
+            Optional<double[]> startPoint = reviewService.findPoint(startPlace);
+            if (startPoint.isPresent()) {
+                startPointArray = startPoint.get();
+                log.info("startPointArray={}", startPointArray);
 
-            String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
-            double[] startParameter = {37.56640973022008, 126.97857314414601}; //ex-"127.12345, 37.12345"
-            double[] endParameter = {37.57621220811897, 126.97672509786915}; //ex-"128.12345,38.12345"
+                startLat = startPointArray[0];
+                startLng = startPointArray[1];
+                log.info("startPointArray[0]={}", startPointArray[0]);
+                log.info("startLat={}", startLat);
 
-            //요청 파라미터 설정 => url 쿼리 스트링 파라미터
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
-                    .queryParam("start", startParameter[0] + "," + startParameter[1])
-                    .queryParam("end", endParameter[0] + "," + endParameter[1]);
+                Optional<double[]> endPoint = reviewService.findPoint(endPlace);
+                if (endPoint.isPresent()) {
+                    endPointArray = endPoint.get();
+                    log.info("endPointArray={}", endPointArray);
 
-            //api 호출 후 응답받은 내용을 string 형태로 routePoint에 저장.
-            String routePointString = webClient.get()
-                    .uri(uriBuilder.toUriString())
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-            log.info("checklog: routePoint:{}", routePointString);
+                    endLat = endPointArray[0];
+                    endLng = endPointArray[1];
+                    log.info("endPointArray[0]={}", endPointArray[0]);
+                    log.info("endLat={}", endLat);
 
 
-            //html 동적 렌더링 코드 추가 예정. (일단 저장 구현부터..)
+                    //(7/30) 1. 경로좌표전달 api호출로 경로데이터 얻기
+                    WebClient webClient = WebClient.create();
 
-            String mapUrl = "테스트 중";
+                    String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/route"; //경로좌표전달 url => 서버 배포 시 url 변경 예정
+                    double[] startParameter = {startLat, startLng}; //ex-"127.12345, 37.12345"
+                    double[] endParameter = {endLat, endLng}; //ex-"128.12345,38.12345"
 
-            //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
+                    //요청 파라미터 설정 => url 쿼리 스트링 파라미터
+                    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
+                            .queryParam("start", startLat + "," + startLng)
+                            .queryParam("end", endLat + "," + endLng);
 
-            //ReviewService 호출
-            returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(session,startPlace, endPlace, content, routePointString);
-            return ResponseEntity.ok(returnReviewDataDTO);
+                    //api 호출 후 응답받은 내용을 string 형태로 routePoint에 저장.
+                    String routePointString = webClient.get()
+                            .uri(uriBuilder.toUriString())
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+                    log.info("checklog: ReviewController_saveReviewController-routePoint:{}", routePointString);
+
+
+                    //(7/30)2. 다른 데이터들 저장과 함께 경로좌표데이터도 저장 .
+                    //ReviewService 호출
+                    //저장하고, 출발지장소명/도착지장소명/후기내용/review_id 반환.
+                    returnReviewDataDTO returnReviewDataDTO = reviewService.saveReview(email, startPlace, endPlace, content, routePointString); //
+
+                    //review_id 구하기
+                    //MapTestController와 MapConfirm은 똑같이 동작하고, html의 지도api 크기만 다름!
+                    //String savedRoutePoint = reviewService.getRoutePointString(review_id);
+                    Long review_id = returnReviewDataDTO.getReview_id();
+
+
+                    //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
+                    WebClient webClient_map = WebClient.create();
+
+                    String apiUrl_map = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
+
+                    UriComponentsBuilder uriBuilder_map = UriComponentsBuilder.fromUriString(apiUrl_map)
+                            .queryParam("review_id", review_id);
+
+                    String mapTest = webClient.get()
+                            .uri(uriBuilder.toUriString())
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+                    log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
+
+                    //html에 경로 표시하기 성공하면
+                    mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id=" + review_id;
+                    log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
+
+
+                    //클라이언트 측에 반환할 데이터들
+                    SavedReviewDataDTO savedReviewDataDTO = new SavedReviewDataDTO();
+                    savedReviewDataDTO.setContent(returnReviewDataDTO.getContent());
+                    savedReviewDataDTO.setStartPlace(returnReviewDataDTO.getStartPlace());
+                    savedReviewDataDTO.setEndPlace(returnReviewDataDTO.getEndPlace());
+                    savedReviewDataDTO.setMapUrl(mapUrl);
+
+
+                    return ResponseEntity.ok(savedReviewDataDTO);
+                }
+            } else {
+                //예외처리
+            }
 
 
         } catch (Exception e) {
@@ -116,55 +180,59 @@ public class ReviewController {
             return null; //예외처리 예정
 
         }
-
+        return null; //예외처리 예정
     }
 
 
-    //후기 게시글 상세 조회
+    /**후기 게시글 상세 조회*/
     @GetMapping("/detail/{review_id}")
     public ReviewDetailDTO reviewDetailContriller(@PathVariable Long review_id, Model model) {
+        log.info("checklog: ReviewController_reviewDetailController");
         try {
+            String mapUrl;
             //예외처리 구현 예정
-            log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", review_id);
+
+            //Html에 동적으로 내용을 전달하기 위해 MapTestController(변경 예정)API를 호출
+            WebClient webClient = WebClient.create();
+            WebClient webClient_map = WebClient.create();
+
+            String apiUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map"; //서버 배포 시 url 변경 예정
+
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl)
+                    .queryParam("review_id", review_id);
+
+            String mapTest = webClient.get()
+                    .uri(uriBuilder.toUriString())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            log.info("checklog: ReviewController_reviewDetailController-mapTest:{}", mapTest);
+
+            //html에 경로 표시하기 성공하면
+            mapUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/map?review_id=" + review_id;
+            log.info("checklog: ReviewController_reviewDetailController-mapUrl:{}", mapUrl);
 
 
-            JsonDataEntity jsonData = reviewService.getJsonData(review_id); //이 부분은 (상세조회컨트롤러에서) 후기와 함께 데이터 가져온 다음, jsonData변수에 넣어주는걸로 바꾸면 될 듯..
-            if (jsonData != null) {
-/**
-                //JsonData를 html에 렌더링하기 위해 Thymeleaf 템플릿으로 전달. (=Thymeleaf를 통해 html로 전달)
-                model.addAttribute("jsonData", jsonDataEntity.getRoutePoint()); //jsonDTO형태로 맞춰서 저장했다가 getter메서드로 가져와서 model로 전달하기.
-                log.info("checklog: ReviewController_reviewDetailContriller-model.addAttribute");
-                //html 렌더링 성공하면 =>
-                String serverUrl = "https://port-0-baco-server-eg4e2alkhufq9d.sel4.cloudtype.app/";
-                String mapUrl = serverUrl + "mapTest"; //변경예정
-                log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", mapUrl);
-*/
+            ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
+            log.info("checklog: ReviewController_reviewDetailController-content:{},mapUrl:{}", reviewDetail.getContent(), mapUrl);
 
-                String mapUrl = "테스트 url";
-                log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", mapUrl);
+            return reviewDetail;
 
-                //review_id로 상세조회 시 필요한 데이터들 객체형태로 가져오는 service 메서드 호출.
-                ReviewDetailDTO reviewDetail = reviewService.reviewDetail(review_id, mapUrl);
-                //log.info("checklog: ReviewController_reviewDetailContriller-reviewDetail:{}", review_id);
+        } catch (
+                Exception e) {
+            log.info("checklog: ReviewController_reviewDetailController-catch");
 
-                //reviewDetailDTO의 mapUrl 에 setMapUrl(mapUrl)해서 설정 후 객체 형태로 반환.
-                // (이후 프론트에서는 json에서 파싱해서 해당 url은 iframe으로 띄우고 다른 정보들도 각각 띄워줌.)
-                return reviewDetail; //
-
-
-            }
-        } catch (Exception e) {
+            //html 경로 표시 실패하면
             //예외처리 구현 예정
             return null;
         }
 
-    return reviewDetailDTO; //수정해야할 듯.
+
     }
 
-    //해시태그 필터링
+    /**해시태그 필터링 목록 조회*/
     @GetMapping("/reviews")
-    public List<Review> showReviews_hashtag(@RequestParam String hashtag){
+    public List<ReviewListDTO> showReviews_hashtag(@RequestParam String hashtag) {
         return reviewService.findHashtagReviews(hashtag);
     }
-
 }
